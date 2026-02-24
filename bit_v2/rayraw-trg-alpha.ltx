@@ -1,0 +1,2612 @@
+{
+    "ltx_root": {
+        "version": 4,
+        "minor": 0,
+        "ltx_data": [
+            {
+                "name": "EDA_PROBESET",
+                "active": true,
+                "debug_cores": [
+                    {
+                        "type": "XSDB_V3",
+                        "name": "dbg_hub",
+                        "spec": "labtools_xsdbm_v3",
+                        "clk_input_freq_hz": "75000003"
+                    },
+                    {
+                        "type": "VIO_V2",
+                        "name": "u_ADC_Inst/u_VIO",
+                        "spec": "labtools_vio_v3",
+                        "ipName": "vio",
+                        "core_location": {
+                            "user_chain": 1,
+                            "slave_index": 0,
+                            "bscan_switch_index": 0
+                        },
+                        "uuid": "C00D30D4D2E65A7CAD89D266AAEF20B7",
+                        "pins": [
+                            {
+                                "name": "probe_out0",
+                                "id": 0,
+                                "type": "DATA",
+                                "direction": "OUT",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 0,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/adc_ro_reset_vio",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/adc_ro_reset_vio[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe_out1",
+                                "id": 1,
+                                "type": "DATA",
+                                "direction": "OUT",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 4,
+                                "portIndex": 1,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/tap_value_in",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/tap_value_in[4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/tap_value_in[3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/tap_value_in[2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/tap_value_in[1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/tap_value_in[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe_out2",
+                                "id": 2,
+                                "type": "DATA",
+                                "direction": "OUT",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 4,
+                                "portIndex": 2,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/tap_value_frame_in",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/tap_value_frame_in[4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/tap_value_frame_in[3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/tap_value_frame_in[2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/tap_value_frame_in[1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/tap_value_frame_in[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe_out3",
+                                "id": 3,
+                                "type": "DATA",
+                                "direction": "OUT",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/en_ext_tapin",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/en_ext_tapin[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ILA_V3",
+                        "name": "u_ila_0",
+                        "spec": "labtools_ila_v6",
+                        "core_location": {
+                            "user_chain": 1,
+                            "slave_index": 1,
+                            "bscan_switch_index": 0
+                        },
+                        "uuid": "23e7d65a79bc59f7bc47406c1714dfae",
+                        "pins": [
+                            {
+                                "name": "probe0",
+                                "id": 4,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 1,
+                                "portIndex": 0,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/state_idelay",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/state_idelay[1]",
+                                                "parentNetId": 12
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/state_idelay[0]",
+                                                "parentNetId": 13
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe1",
+                                "id": 5,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 2,
+                                "portIndex": 1,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/state_bitslip",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/state_bitslip[2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/state_bitslip[1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/state_bitslip[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe2",
+                                "id": 6,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 2,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][1][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 7,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][0][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 8,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][5][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 9,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][4][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe6",
+                                "id": 10,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 6,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][2][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 11,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][6][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe8",
+                                "id": 12,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 8,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_frame_out[0]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[0][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[0][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[0][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[0][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[0][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[0][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[0][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[0][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[0][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[0][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe9",
+                                "id": 13,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 9,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][3][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe10",
+                                "id": 14,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 10,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[0][7][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe11",
+                                "id": 15,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 11,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/is_ready_1",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/is_ready_1[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 16,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/serdes_reset",
+                                        "isBus": false,
+                                        "parentNetId": 108
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ILA_V3",
+                        "name": "u_ila_1",
+                        "spec": "labtools_ila_v6",
+                        "core_location": {
+                            "user_chain": 1,
+                            "slave_index": 2,
+                            "bscan_switch_index": 0
+                        },
+                        "uuid": "3b505a030738513c98471d25f5b1f848",
+                        "pins": [
+                            {
+                                "name": "probe0",
+                                "id": 17,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 2,
+                                "portIndex": 0,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/state_bitslip",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/state_bitslip[2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/state_bitslip[1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/state_bitslip[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe1",
+                                "id": 18,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 1,
+                                "portIndex": 1,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/state_idelay",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/state_idelay[1]",
+                                                "parentNetId": 112
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/state_idelay[0]",
+                                                "parentNetId": 113
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe2",
+                                "id": 19,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 2,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_frame_out[1]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[1][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[1][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[1][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[1][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[1][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[1][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[1][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[1][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[1][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[1][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 20,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][1][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 21,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][2][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 22,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][4][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe6",
+                                "id": 23,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 6,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][5][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 24,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][6][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe8",
+                                "id": 25,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 8,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][0][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe9",
+                                "id": 26,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 9,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][3][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe10",
+                                "id": 27,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 10,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[1][7][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe11",
+                                "id": 28,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 11,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/is_ready_2",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/is_ready_2[1]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 29,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/serdes_reset",
+                                        "isBus": false,
+                                        "parentNetId": 205
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ILA_V3",
+                        "name": "u_ila_2",
+                        "spec": "labtools_ila_v6",
+                        "core_location": {
+                            "user_chain": 1,
+                            "slave_index": 3,
+                            "bscan_switch_index": 0
+                        },
+                        "uuid": "b13c981ac2d554bfb4fbe0eecea5cfd7",
+                        "pins": [
+                            {
+                                "name": "probe0",
+                                "id": 30,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 2,
+                                "portIndex": 0,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/state_bitslip",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/state_bitslip[2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/state_bitslip[1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/state_bitslip[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe1",
+                                "id": 31,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 1,
+                                "portIndex": 1,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/state_idelay",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/state_idelay[1]",
+                                                "parentNetId": 209
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/state_idelay[0]",
+                                                "parentNetId": 210
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe2",
+                                "id": 32,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 2,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][3][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 33,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][2][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 34,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][5][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 35,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][7][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe6",
+                                "id": 36,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 6,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][0][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 37,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][6][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe8",
+                                "id": 38,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 8,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][1][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe9",
+                                "id": 39,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 9,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[2][4][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe10",
+                                "id": 40,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 10,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/is_ready_3",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/is_ready_3[2]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe11",
+                                "id": 41,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 11,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_frame_out[2]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[2][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[2][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[2][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[2][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[2][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[2][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[2][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[2][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[2][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[2][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 42,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/serdes_reset",
+                                        "isBus": false,
+                                        "parentNetId": 302
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ILA_V3",
+                        "name": "u_ila_3",
+                        "spec": "labtools_ila_v6",
+                        "core_location": {
+                            "user_chain": 1,
+                            "slave_index": 4,
+                            "bscan_switch_index": 0
+                        },
+                        "uuid": "9c18410bb87b565386c9544cba1f346f",
+                        "pins": [
+                            {
+                                "name": "probe0",
+                                "id": 43,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 2,
+                                "portIndex": 0,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/state_bitslip",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/state_bitslip[2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/state_bitslip[1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/state_bitslip[0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe1",
+                                "id": 44,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 1,
+                                "portIndex": 1,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/state_idelay",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/state_idelay[1]",
+                                                "parentNetId": 306
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/state_idelay[0]",
+                                                "parentNetId": 307
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe2",
+                                "id": 45,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 2,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][2][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe3",
+                                "id": 46,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 3,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][6][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe4",
+                                "id": 47,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 4,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][7][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe5",
+                                "id": 48,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 5,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_frame_out[3]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[3][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[3][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[3][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[3][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[3][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[3][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[3][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[3][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[3][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_frame_out[3][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe6",
+                                "id": 49,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 6,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][0][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe7",
+                                "id": 50,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 7,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][1][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe8",
+                                "id": 51,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 8,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][3][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe9",
+                                "id": 52,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 9,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][4][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe10",
+                                "id": 53,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": true,
+                                "leftIndex": 0,
+                                "rightIndex": 9,
+                                "portIndex": 10,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5]",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5][9]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5][8]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5][7]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5][6]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5][5]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5][4]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5][3]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5][2]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5][1]"
+                                            },
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/adc_data_out[3][5][0]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe11",
+                                "id": 54,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 11,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/is_ready",
+                                        "isBus": true,
+                                        "subnets": [
+                                            {
+                                                "name": "u_ADC_Inst/u_ADC/is_ready[3]"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "probe12",
+                                "id": 55,
+                                "type": "DATA_TRIGGER",
+                                "direction": "IN",
+                                "isVector": false,
+                                "leftIndex": 0,
+                                "rightIndex": 0,
+                                "portIndex": 12,
+                                "nets": [
+                                    {
+                                        "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/serdes_reset",
+                                        "isBus": false,
+                                        "parentNetId": 399
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "parent_nets": [
+                    {
+                        "id": 12,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/state_idelay[1]",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/FSM_onehot_state_idelay_reg[2]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "001"
+                                    },
+                                    {
+                                        "name": "tapload",
+                                        "val": "010"
+                                    },
+                                    {
+                                        "name": "idelayadjusted",
+                                        "val": "100"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 13,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/state_idelay[0]",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/FSM_onehot_state_idelay_reg[1]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "001"
+                                    },
+                                    {
+                                        "name": "tapload",
+                                        "val": "010"
+                                    },
+                                    {
+                                        "name": "idelayadjusted",
+                                        "val": "100"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 108,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/serdes_reset",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[0].u_adc/FSM_onehot_state_bitslip_reg[1]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "000001"
+                                    },
+                                    {
+                                        "name": "waitstart",
+                                        "val": "000010"
+                                    },
+                                    {
+                                        "name": "bitslipfinished",
+                                        "val": "001000"
+                                    },
+                                    {
+                                        "name": "bitslip",
+                                        "val": "010000"
+                                    },
+                                    {
+                                        "name": "checkframepatt",
+                                        "val": "000100"
+                                    },
+                                    {
+                                        "name": "bitslipfailure",
+                                        "val": "100000"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 112,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/state_idelay[1]",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/FSM_onehot_state_idelay_reg[2]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "001"
+                                    },
+                                    {
+                                        "name": "tapload",
+                                        "val": "010"
+                                    },
+                                    {
+                                        "name": "idelayadjusted",
+                                        "val": "100"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 113,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/state_idelay[0]",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/FSM_onehot_state_idelay_reg[1]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "001"
+                                    },
+                                    {
+                                        "name": "tapload",
+                                        "val": "010"
+                                    },
+                                    {
+                                        "name": "idelayadjusted",
+                                        "val": "100"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 205,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/serdes_reset",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[1].u_adc/FSM_onehot_state_bitslip_reg[1]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "000001"
+                                    },
+                                    {
+                                        "name": "waitstart",
+                                        "val": "000010"
+                                    },
+                                    {
+                                        "name": "bitslipfinished",
+                                        "val": "001000"
+                                    },
+                                    {
+                                        "name": "bitslip",
+                                        "val": "010000"
+                                    },
+                                    {
+                                        "name": "checkframepatt",
+                                        "val": "000100"
+                                    },
+                                    {
+                                        "name": "bitslipfailure",
+                                        "val": "100000"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 209,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/state_idelay[1]",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/FSM_onehot_state_idelay_reg[2]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "001"
+                                    },
+                                    {
+                                        "name": "tapload",
+                                        "val": "010"
+                                    },
+                                    {
+                                        "name": "idelayadjusted",
+                                        "val": "100"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 210,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/state_idelay[0]",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/FSM_onehot_state_idelay_reg[1]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "001"
+                                    },
+                                    {
+                                        "name": "tapload",
+                                        "val": "010"
+                                    },
+                                    {
+                                        "name": "idelayadjusted",
+                                        "val": "100"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 302,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/serdes_reset",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[2].u_adc/FSM_onehot_state_bitslip_reg[1]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "000001"
+                                    },
+                                    {
+                                        "name": "waitstart",
+                                        "val": "000010"
+                                    },
+                                    {
+                                        "name": "bitslipfinished",
+                                        "val": "001000"
+                                    },
+                                    {
+                                        "name": "bitslip",
+                                        "val": "010000"
+                                    },
+                                    {
+                                        "name": "checkframepatt",
+                                        "val": "000100"
+                                    },
+                                    {
+                                        "name": "bitslipfailure",
+                                        "val": "100000"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 306,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/state_idelay[1]",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/FSM_onehot_state_idelay_reg[2]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "001"
+                                    },
+                                    {
+                                        "name": "tapload",
+                                        "val": "010"
+                                    },
+                                    {
+                                        "name": "idelayadjusted",
+                                        "val": "100"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 307,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/state_idelay[0]",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/FSM_onehot_state_idelay_reg[1]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "001"
+                                    },
+                                    {
+                                        "name": "tapload",
+                                        "val": "010"
+                                    },
+                                    {
+                                        "name": "idelayadjusted",
+                                        "val": "100"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 399,
+                        "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/serdes_reset",
+                        "state_reg": [
+                            {
+                                "name": "u_ADC_Inst/u_ADC/gen_adc[3].u_adc/FSM_onehot_state_bitslip_reg[1]",
+                                "states": [
+                                    {
+                                        "name": "init",
+                                        "val": "000001"
+                                    },
+                                    {
+                                        "name": "waitstart",
+                                        "val": "000010"
+                                    },
+                                    {
+                                        "name": "bitslipfinished",
+                                        "val": "001000"
+                                    },
+                                    {
+                                        "name": "bitslip",
+                                        "val": "010000"
+                                    },
+                                    {
+                                        "name": "checkframepatt",
+                                        "val": "000100"
+                                    },
+                                    {
+                                        "name": "bitslipfailure",
+                                        "val": "100000"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

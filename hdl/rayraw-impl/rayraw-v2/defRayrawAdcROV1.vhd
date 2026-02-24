@@ -33,8 +33,8 @@ package body defRayrawAdcROV1 is
     case index is
       when 0 => return("011100111");
       when 1 => return("001101110");
-      when 2 => return("001110011");
-      when 3 => return("110010000");
+      when 2 => return("101110111");
+      when 3 => return("110010010");
       when others => return("000000000");
 
     end case;

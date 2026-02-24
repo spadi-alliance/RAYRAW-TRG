@@ -9,6 +9,10 @@ use mylib.defEVB.all;
 use mylib.defSiTCP.all;
 
 entity EventBuilder is
+  generic
+  (
+    kEigenWord  : std_logic_vector(kWidthDaqWord-1 downto 0):= x"ffff0160"
+  );
   port(
     rst	        : in std_logic;
     clk         : in std_logic;

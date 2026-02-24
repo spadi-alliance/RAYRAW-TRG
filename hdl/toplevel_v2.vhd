@@ -683,6 +683,9 @@ begin
   evb_reset   <= user_reset OR evb_reset_from_DCT;
 
   u_EVB_Inst : entity mylib.EventBuilder
+    generic map(
+      kEigenWord  => x"ffff0162"
+    )
     port map(
       rst         => evb_reset,
       clk         => clk_sys,
@@ -761,7 +764,7 @@ begin
   -- BCT --------------------------------------------------------------------
   u_BCT_Inst : entity mylib.BusController
     port map(
-      rstSys                    => bct_reset,
+      rstSys                    => bct_reset or sitcp_reset,
       rstFromBus                => rst_from_bus,
       reConfig                  => PROGB_ON,
       clk                       => clk_sys,
@@ -892,7 +895,7 @@ begin
   u_RbcpCdc : entity mylib.RbcpCdc
   port map(
     -- Mikumari clock domain --
-    rstSys      => system_reset,
+    rstSys      => system_reset or sitcp_reset,
     clkSys      => clk_sys,
     rbcpAddr    => rbcp_addr(i),
     rbcpWd      => rbcp_wd(i),
@@ -902,7 +905,7 @@ begin
     rbcpRd      => rbcp_rd(i),
 
     -- GMII clock domain --
-    rstXgmii    => pwr_on_reset,
+    rstXgmii    => pwr_on_reset or sitcp_reset,
     clkXgmii    => clk_link,
     rbcpXgAddr  => rbcp_gmii_addr(i),
     rbcpXgWd    => rbcp_gmii_wd(i),
@@ -914,7 +917,7 @@ begin
 
     u_gTCP_inst : entity mylib.global_sitcp_manager
       port map(
-        RST           => pwr_on_reset,
+        RST           => pwr_on_reset or sitcp_reset,
         CLK           => clk_link,
         ACTIVE        => tcp_isActive(i),
         REQ           => close_req(i),

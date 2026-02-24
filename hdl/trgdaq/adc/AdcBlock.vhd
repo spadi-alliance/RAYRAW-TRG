@@ -57,7 +57,7 @@ entity AdcBlock is
 end AdcBlock;
 
 architecture RTL of AdcBlock is
-  --attribute mark_debug    : string;
+  attribute mark_debug    : string;
   --attribute keep          : string;
 
   -- internal signals -------------------------------------------------------
@@ -239,7 +239,7 @@ architecture RTL of AdcBlock is
   END COMPONENT;
 
   -- debug ------------------------------------------------------------------
-   --attribute mark_debug of full_flag     : signal is "true";
+  --attribute mark_debug of adc_ro_reset     : signal is "true";
    ---attribute mark_debug of pgfull_flag   : signal is "true";
    --attribute mark_debug of busy_fifo     : signal is "true";
    --attribute mark_debug of full_block    : signal is "true";

@@ -15,7 +15,7 @@ package defEVB is
   -- Header2  : Data size
   -- Header3  : Event number
   -- Data
-  constant kEigenWord         : std_logic_vector(kWidthDaqWord-1 downto 0):= x"ffff0160";
+  --constant kEigenWord         : std_logic_vector(kWidthDaqWord-1 downto 0):= x"ffff0160";
 
   -- Trigger record readout --
   type dataEvb2Trm is record
