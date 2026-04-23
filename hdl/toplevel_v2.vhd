@@ -464,6 +464,7 @@ begin
       ExtClear                => '0',
       ExtL1                   => ext_L1,
       ExtL2                   => '0',
+      ExtTAG                  => "0000",
 
       -- J0 trigger --
       J0Clear                 => '0',
@@ -477,6 +478,12 @@ begin
       RML1                    => '0',
       RML2                    => '0',
       RMTAG                   => "0000",
+
+      -- Self trigger --
+      SelfClear                 => '0',
+      SelfL1                    => '0',
+      SelfL2                    => '0',
+      SelfTAG                   => "0000",
 
       -- module input --
       dInTRM                  => reg_evb2trm,
