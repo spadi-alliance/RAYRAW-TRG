@@ -9,10 +9,10 @@ package defTRM is
   constant kWidthTAG            : positive:= 4;
 
   -- Trigger control
-  constant kNumOfTrigType       : positive:= 3;
-  constant kTrigAllZero         : std_logic_vector(kNumOfTrigType-1 downto 0):= "000";
+  constant kNumOfTrigType       : positive:= 4;
+  constant kTrigAllZero         : std_logic_vector(kNumOfTrigType-1 downto 0):= "0000";
   
-  constant kWidthSelTrig        : integer := 12;
+  constant kWidthSelTrig        : integer := 16;
 
   subtype RegID is integer range 0 to kWidthSelTrig-1;
   type regLeaf is record
@@ -21,15 +21,19 @@ package defTRM is
   constant kL1Ext     : regLeaf := (Index => 0);
   constant kL1J0      : regLeaf := (Index => 1);
   constant kL1RM      : regLeaf := (Index => 2);
-  constant kL2Ext     : regLeaf := (Index => 3);
-  constant kL2J0      : regLeaf := (Index => 4);
-  constant kL2RM      : regLeaf := (Index => 5);
-  constant kClrExt    : regLeaf := (Index => 6);
-  constant kClrJ0     : regLeaf := (Index => 7);
-  constant kClrRM     : regLeaf := (Index => 8);
-  constant kEnL2      : regLeaf := (Index => 9);
-  constant kEnJ0      : regLeaf := (Index => 10);
-  constant kEnRM      : regLeaf := (Index => 11);
+  constant kL1Self    : regLeaf := (Index => 3);
+  constant kL2Ext     : regLeaf := (Index => 4);
+  constant kL2J0      : regLeaf := (Index => 5);
+  constant kL2RM      : regLeaf := (Index => 6);
+  constant kL2Self    : regLeaf := (Index => 7);
+  constant kClrExt    : regLeaf := (Index => 8);
+  constant kClrJ0     : regLeaf := (Index => 9);
+  constant kClrRM     : regLeaf := (Index => 10);
+  constant kClrSelf   : regLeaf := (Index => 11);
+  constant kEnL2      : regLeaf := (Index => 12);
+  constant kEnJ0      : regLeaf := (Index => 13);
+  constant kEnRM      : regLeaf := (Index => 14);
+  constant kEnSelf    : regLeaf := (Index => 15);
 
   -- Trigger sequence
   constant kWidthTriggerData    : positive:= 6;
@@ -54,6 +58,6 @@ package defTRM is
   end record;
 
   -- Local Address --------------------------------------------------------
-  constant kSelectTrigger       : LocalAddressType := x"000"; -- W/R, [11:0]
+  constant kSelectTrigger       : LocalAddressType := x"000"; -- W/R, [11:0] -> W/R, [15:0]
   
 end package defTRM;
