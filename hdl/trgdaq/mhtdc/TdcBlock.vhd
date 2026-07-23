@@ -36,7 +36,10 @@ entity TdcBlock is
     rvBuilderBus        : out std_logic;
     dReadyBuilderBus    : out std_logic;
     bindBuilderBus      : in  std_logic;
-    isBoundToBuilder    : out std_logic
+    isBoundToBuilder    : out std_logic;
+
+    -- self trigger --
+    hitFoundOut : out std_logic_vector(kNumInputBlock-1 downto 0)
 
     );
 end TdcBlock;
@@ -229,25 +232,67 @@ architecture RTL of TdcBlock is
   END COMPONENT;
 
   -- debug ------------------------------------------------------------------
+  -- Ring Buffer--
+   attribute mark_debug of rb_in          : signal is "true";
+   attribute mark_debug of rv_ringbuf_pre : signal is "true";
+   attribute mark_debug of re_ringbuf     : signal is "true";
+   attribute mark_debug of rv_ringbuf     : signal is "true";
+   attribute mark_debug of read_ptr       : signal is "true";
+   attribute mark_debug of rb_out         : signal is "true";
+
+  -- Channel Buffer --
+   -- attribute mark_debug of we_chfifo     : signal is "true";
+   attribute mark_debug of reg_we_chfifo     : signal is "true";
+   attribute mark_debug of raw_we_chfifo     : signal is "true";
+   attribute mark_debug of bufwe_ring2chfifo : signal is "true";
+   -- attribute mark_debug of re_chfifo     : signal is "true";
+   attribute mark_debug of bufd_ring2chfifo  : signal is "true";
+   attribute mark_debug of dcount_chfifo     : signal is "true";
+
+  -- Hit search --
+   attribute mark_debug of state_search    : signal is "true";
+   attribute mark_debug of cstop_issued    : signal is "true";
+   attribute mark_debug of cstop_value     : signal is "true";
+   attribute mark_debug of reg_cstop_value : signal is "true";
+   attribute mark_debug of coarse_counter  : signal is "true";
+   -- attribute mark_debug of busy_process  : signal is "true";
+   attribute mark_debug of raw_tdc_value   : signal is "true";
+   attribute mark_debug of tdc_value       : signal is "true";
+
 --   attribute mark_debug of state_daq     : signal is "true";
 --   attribute mark_debug of state_trans   : signal is "true";
---   attribute mark_debug of full_flag     : signal is "true";
---   attribute mark_debug of pgfull_flag   : signal is "true";
---   attribute mark_debug of busy_fifo     : signal is "true";
---   attribute mark_debug of full_block    : signal is "true";
---   attribute mark_debug of afull_block   : signal is "true";
---   attribute mark_debug of busy_process  : signal is "true";
---   attribute mark_debug of busyTdc       : signal is "true";
---   attribute mark_debug of cstop_issued  : signal is "true";
---    attribute mark_debug of we_endevent  : signal is "true";
---    attribute mark_debug of dready_fifo  : signal is "true";
---    attribute mark_debug of we_block_buffer  : signal is "true";
---    attribute mark_debug of we_chfifo  : signal is "true";
---    attribute mark_debug of re_chfifo  : signal is "true";
+   -- attribute mark_debug of full_flag     : signal is "true";
+   -- attribute mark_debug of pgfull_flag   : signal is "true";
+   -- attribute mark_debug of busy_fifo     : signal is "true";
+   -- attribute mark_debug of full_block    : signal is "true";
+   -- attribute mark_debug of afull_block   : signal is "true";
+   -- attribute mark_debug of busyTdc       : signal is "true";
+   -- attribute mark_debug of busy_tdc      : signal is "true";
+   -- attribute mark_debug of full_fifo     : signal is "true";
+   -- attribute mark_debug of pgfull_fifo   : signal is "true";
+   -- attribute mark_debug of empty_fifo    : signal is "true";
+   -- attribute mark_debug of last_ch_count : signal is "true";
+   -- attribute mark_debug of nospace_flag  : signal is "true"
+   -- attribute mark_debug of state_build    : signal is "true";
+   -- attribute mark_debug of we_block_buffer : signal is "true";
+   -- attribute mark_debug of re_block_buffer : signal is "true";
+   -- attribute mark_debug of rv_block_buffer : signal is "true";
+   -- attribute mark_debug of empty_block   : signal is "true";
+   -- attribute mark_debug of pgfull_block_buffer : signal is "true";
+   -- attribute mark_debug of we_evsum      : signal is "true";
+   -- attribute mark_debug of re_evsum      : signal is "true";
+   -- attribute mark_debug of rv_evsum      : signal is "true";
+   -- attribute mark_debug of data_ready    : signal is "true";
+   -- attribute mark_debug of bind_bbus     : signal is "true";
+   -- attribute mark_debug of is_bound_to_builder : signal is "true";
+   -- attribute mark_debug of re_bbus       : signal is "true";
+   -- attribute mark_debug of rv_bbus       : signal is "true";
+   -- attribute mark_debug of dout_bbus     : signal is "true";
+   -- attribute mark_debug of we_endevent   : signal is "true";
+   -- attribute mark_debug of dready_fifo   : signal is "true";
 --    attribute mark_debug of dcount_chfifo  : signal is "true";
---  attribute mark_debug of coarse_counter : signal is "true";
 --    attribute mark_debug of overflow_flag : signal is "true";
---    attribute mark_debug of n_of_word : signal is "true";
+   -- attribute mark_debug of n_of_word : signal is "true";
 --    attribute mark_debug of din_block_buffer : signal is "true";
 
 
@@ -329,6 +374,8 @@ begin
     -- Ring buffer input --
     rb_in(kWidthRingData*i +kIndexHit downto kWidthRingData*i)  <=   hit_found(i) & decoded_fcount(i);
   end generate;
+
+  hitFoundOut <= hit_found;
 
   -- instance of ring buffer --
   u_RingBuffer : ringbuffer_bram_v1

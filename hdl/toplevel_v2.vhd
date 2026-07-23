@@ -161,6 +161,9 @@ architecture Behavioral of toplevel is
   signal tdc_busy       : std_logic;
   signal data_tdc_bbus  : BBusDataTDC;
 
+  signal self_trig_nim  : std_logic;
+  signal TdcHit         : std_logic_vector(kNumInput-1 downto 0);
+
   -- ADC ---------------------------------------------------------------------
   signal adc_busy         : std_logic;
   signal data_adc_bbus    : BBusDataType;
@@ -393,6 +396,8 @@ architecture Behavioral of toplevel is
 
   -- debug -----------------------------------------------------------------------------
   --attribute mark_debug of clk_150MHz : signal is "true";
+  -- attribute mark_debug of self_trig_nim : signal is "true";
+  attribute mark_debug of module_busy : signal is "true";
 
 begin
   -- ===================================================================================
@@ -426,7 +431,7 @@ begin
 
   NIM_OUT(1)  <= clk_sys;
   NIM_OUT(2)  <= module_busy;
-  NIM_OUT(3)  <= '0';
+  NIM_OUT(3)  <= self_trig_nim;
   NIM_OUT(4)  <= '0';
 --  NIM_OUT(2)  <= gclk_adc(0) when (DIP(7 downto 6) = "00") else
 --                 gclk_adc(1) when (DIP(7 downto 6) = "01") else
@@ -464,6 +469,7 @@ begin
       ExtClear                => '0',
       ExtL1                   => ext_L1,
       ExtL2                   => '0',
+      ExtTAG                  => "0000",
 
       -- J0 trigger --
       J0Clear                 => '0',
@@ -477,6 +483,12 @@ begin
       RML1                    => '0',
       RML2                    => '0',
       RMTAG                   => "0000",
+
+      -- Self trigger --
+      SelfClear                 => '0',
+      SelfL1                    => '0',
+      SelfL2                    => '0',
+      SelfTAG                   => "0000",
 
       -- module input --
       dInTRM                  => reg_evb2trm,
@@ -549,7 +561,13 @@ begin
       dataLocalBusOut     => data_LocalBusOut(kTDC.ID),
       reLocalBus          => re_LocalBus(kTDC.ID),
       weLocalBus          => we_LocalBus(kTDC.ID),
-      readyLocalBus       => ready_LocalBus(kTDC.ID)
+      readyLocalBus       => ready_LocalBus(kTDC.ID),
+
+      -- Self trigger --
+      selfTrig            => self_trig_nim,
+
+      -- Hit info --
+      tdcHit              => TdcHit
       );
 
   -- ADC -------------------------------------------------------------------------------
@@ -589,7 +607,10 @@ begin
       dataLocalBusOut     => data_LocalBusOut(kADC.ID),
       reLocalBus          => re_LocalBus(kADC.ID),
       weLocalBus          => we_LocalBus(kADC.ID),
-      readyLocalBus       => ready_LocalBus(kADC.ID)
+      readyLocalBus       => ready_LocalBus(kADC.ID),
+
+      -- Tdc hit --
+      tdc_hit             => TdcHit
       );
 
   -- IOM -------------------------------------------------------------------------------
@@ -683,6 +704,9 @@ begin
   evb_reset   <= user_reset OR evb_reset_from_DCT;
 
   u_EVB_Inst : entity mylib.EventBuilder
+    generic map(
+      kEigenWord  => x"ffff0162"
+    )
     port map(
       rst         => evb_reset,
       clk         => clk_sys,
@@ -761,7 +785,7 @@ begin
   -- BCT --------------------------------------------------------------------
   u_BCT_Inst : entity mylib.BusController
     port map(
-      rstSys                    => bct_reset,
+      rstSys                    => bct_reset or sitcp_reset,
       rstFromBus                => rst_from_bus,
       reConfig                  => PROGB_ON,
       clk                       => clk_sys,
@@ -892,7 +916,7 @@ begin
   u_RbcpCdc : entity mylib.RbcpCdc
   port map(
     -- Mikumari clock domain --
-    rstSys      => system_reset,
+    rstSys      => system_reset or sitcp_reset,
     clkSys      => clk_sys,
     rbcpAddr    => rbcp_addr(i),
     rbcpWd      => rbcp_wd(i),
@@ -902,7 +926,7 @@ begin
     rbcpRd      => rbcp_rd(i),
 
     -- GMII clock domain --
-    rstXgmii    => pwr_on_reset,
+    rstXgmii    => pwr_on_reset or sitcp_reset,
     clkXgmii    => clk_link,
     rbcpXgAddr  => rbcp_gmii_addr(i),
     rbcpXgWd    => rbcp_gmii_wd(i),
@@ -914,7 +938,7 @@ begin
 
     u_gTCP_inst : entity mylib.global_sitcp_manager
       port map(
-        RST           => pwr_on_reset,
+        RST           => pwr_on_reset or sitcp_reset,
         CLK           => clk_link,
         ACTIVE        => tcp_isActive(i),
         REQ           => close_req(i),
