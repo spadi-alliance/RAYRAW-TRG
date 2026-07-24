@@ -1,6 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
-
+use ieee.numeric_std.all;
 
 library mylib;
 use mylib.defYaenamiAdc.all;
@@ -11,13 +11,21 @@ package defAdcBlock is
   constant kNumAdcInputBlock  : positive:= kNumAsicBlock*kNumAdcCh; -- 32: 4*8
   constant kWidthCoarseCount  : positive:= 11;
 
+  -- hit delay --
+  constant kDelayTdcHit       : positive:= 10;
+
+  type TdcHitDelayArray is array(0 to kDelayTdcHit-1)
+    of std_logic_vector(kNumAdcInputBlock-1 downto 0);
+
   -- channel buffer --
   constant kWidthAdcChDataCount  : positive:= 12;
   constant kMaxAdcChDepth        : positive:= 4056;
-  constant kMaxAdcChThreshold    : positive:= 40;
+  constant kMaxAdcChThreshold    : positive:= 10;
   type chAdcDcountArray is array (integer range kNumAdcInputBlock-1 downto 0)
     of std_logic_vector(kWidthAdcChDataCount-1 downto 0);
 
+  type chAdcReservedDcountArray is array (integer range kNumAdcInputBlock-1 downto 0)
+    of unsigned(kWidthAdcChDataCount-1 downto 0);
 
   -- block buffer
   constant kWidthAdcData      : positive:= kWidthCoarseCount + kNumAdcBit; -- 11+10
@@ -65,5 +73,15 @@ package defAdcBlock is
   constant kWinMin          : LocalAddressType := x"020"; -- W/R, [10:0], Min coarse counter
   constant kAdcRoReset      : LocalAddressType := x"030"; -- W/R, [0:0], Reset to AdcRo (default is HIGH)
   constant kIsReady         : LocalAddressType := x"040"; -- R,   [3:0], AdcRo IsReady signals
+
+  -- Region of interest ---------------------------------------------------
+  constant kRoiPre          : positive:= 20; -- -> change into register [4:0]
+  constant kRoiPost         : positive:= 80; -- -> change into register [6:0]
+  constant kWidthRoiCount   : positive:= 8;
+
+  type AdcDelayArray is array(0 to kRoiPre) of chAdcDataArray;
+
+  type RoiCountArray is array(0 to kNumAdcInputBlock-1)
+    of unsigned(kWidthRoiCount-1 downto 0);
 
 end package defAdcBlock;

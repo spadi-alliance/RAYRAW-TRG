@@ -51,7 +51,10 @@ entity AdcBlock is
     dataLocalBusOut     : out LocalBusOutType;
     reLocalBus          : in std_logic;
     weLocalBus          : in std_logic;
-    readyLocalBus       : out std_logic
+    readyLocalBus       : out std_logic;
+
+    -- Tdc hit --
+    tdc_hit              : in std_logic_vector(kNumAdcInputBlock-1 downto 0)
 
     );
 end AdcBlock;
@@ -105,6 +108,7 @@ architecture RTL of AdcBlock is
 
   signal re_ringbuf       : std_logic;
   signal rv_ringbuf       : std_logic;
+  signal rv_ringbuf_buf   : std_logic;
 
   signal read_ptr     : std_logic_vector(kWidthCoarseCount-1 downto 0);
   signal rb_out       : std_logic_vector(kNumAdcBit*kNumAdcInputBlock-1 downto 0); -- 32*10
@@ -147,6 +151,8 @@ architecture RTL of AdcBlock is
   signal nospace_flag   : std_logic_vector(kNumAdcInputBlock-1 downto 0);
   signal busy_fifo      : std_logic;
 
+  signal reserved_data_count : chAdcReservedDcountArray;
+
   COMPONENT channel_buffer_adc
     PORT (
       clk         : IN STD_LOGIC;
@@ -168,11 +174,12 @@ architecture RTL of AdcBlock is
 
   signal cstop_issued           : std_logic;
   signal coarse_counter         : std_logic_vector(kWidthCoarseCount-1 downto 0);
+  signal coarse_counter_buf     : std_logic_vector(kWidthCoarseCount-1 downto 0);
   signal busy_process           : std_logic;
   signal data_bit               : std_logic;
+  signal data_bit_buf           : std_logic;
 
   signal lastword_count         : std_logic_vector(kWidthLastCount-1 downto 0);
-  signal finalize_count         : std_logic;
   signal we_endevent            : std_logic;
 
   -- Partial event build sequence ----------------------------------------------------
@@ -189,13 +196,13 @@ architecture RTL of AdcBlock is
   signal din_block_buffer       : std_logic_vector(kWidthDaqWord-1 downto 0);
   signal din_block_buffer_buf   : std_logic_vector(kWidthDaqWord-1 downto 0);
   signal dout_block_buffer      : std_logic_vector(kWidthDaqWord-1 downto 0);
-  signal we_ok_to_blbuffer      : std_logic;
   signal we_block_buffer        : std_logic;
   signal we_block_buffer_buf    : std_logic;
   signal re_block_buffer        : std_logic;
   signal rv_block_buffer        : std_logic;
   signal pgfull_block_buffer    : std_logic;
-  signal empty_bbuffer            : std_logic;
+  signal full_block_buffer      : std_logic;
+  signal empty_bbuffer          : std_logic;
 
   COMPONENT block_buffer_adc
     PORT (
@@ -239,32 +246,82 @@ architecture RTL of AdcBlock is
   END COMPONENT;
 
   -- debug ------------------------------------------------------------------
-  --attribute mark_debug of adc_ro_reset     : signal is "true";
-   ---attribute mark_debug of pgfull_flag   : signal is "true";
-   --attribute mark_debug of busy_fifo     : signal is "true";
-   --attribute mark_debug of full_block    : signal is "true";
-   --attribute mark_debug of afull_block   : signal is "true";
-   --attribute mark_debug of busy_process  : signal is "true";
-   --attribute mark_debug of busyAdc       : signal is "true";
-   --attribute mark_debug of we_ringbuf    : signal is "true";
-   --attribute mark_debug of re_ringbuf    : signal is "true";
-   --attribute mark_debug of rv_ringbuf    : signal is "true";
-   --attribute mark_debug of we_chfifo    : signal is "true";
-   --attribute mark_debug of bufwe_ring2chfifo    : signal is "true";
-   --attribute mark_debug of re_chfifo    : signal is "true";
-   --attribute mark_debug of rv_raw_chfifo    : signal is "true";
-   --attribute mark_debug of n_of_word    : signal is "true";
-   --attribute mark_debug of coarse_counter    : signal is "true";
-   --attribute mark_debug of cstop_issued : signal is "true";
-   --attribute mark_debug of pgfull_fifo : signal is "true";
-   --attribute mark_debug of data_bit    : signal is "true";
-   --attribute mark_debug of state_search    : signal is "true";
-   --attribute mark_debug of state_build    : signal is "true";
-   --attribute mark_debug of state_bbus    : signal is "true";
-   --attribute mark_debug of empty_fifo    : signal is "true"; --chfifo
-   --attribute mark_debug of empty_bbuffer    : signal is "true"; --block buffer
-   --attribute mark_debug of empty_block    : signal is "true"; --evsum
-   --attribute mark_debug of local_index    : signal is "true"; --evsum
+  -- Internal signals --
+   attribute mark_debug of busy_adc            : signal is "true";
+   -- attribute mark_debug of state_bbus          : signal is "true";
+   -- attribute mark_debug of dout_bbus           : signal is "true";
+   -- attribute mark_debug of re_bbus             : signal is "true";
+   -- attribute mark_debug of rv_bbus             : signal is "true";
+   -- attribute mark_debug of bind_bbus           : signal is "true";
+   -- attribute mark_debug of is_bound_to_builder : signal is "true";
+
+  -- Ring Buffer --
+   -- attribute mark_debug of rb_in          : signal is "true";
+   -- attribute mark_debug of we_ringbuf     : signal is "true";
+   -- attribute mark_debug of write_ptr      : signal is "true";
+   -- attribute mark_debug of re_ringbuf     : signal is "true";
+   -- attribute mark_debug of rv_ringbuf     : signal is "true";
+   -- attribute mark_debug of rv_ringbuf_buf : signal is "true";
+   -- attribute mark_debug of rb_out         : signal is "true";
+   -- attribute mark_debug of read_ptr       : signal is "true";
+
+  -- Channel Buffer --
+   -- attribute mark_debug of we_chfifo         : signal is "true";
+   -- attribute mark_debug of bufwe_ring2chfifo : signal is "true";
+   -- attribute mark_debug of re_chfifo         : signal is "true";
+   -- attribute mark_debug of rv_raw_chfifo     : signal is "true";
+
+  -- Fifo Control --
+   -- attribute mark_debug of bufd_ring2chfifo : signal is "true";
+   -- attribute mark_debug of dout_chfifo      : signal is "true";
+   -- attribute mark_debug of full_fifo        : signal is "true";
+   -- attribute mark_debug of pgfull_fifo      : signal is "true";
+   -- attribute mark_debug of full_flag        : signal is "true";
+   -- attribute mark_debug of pgfull_flag      : signal is "true";
+   -- attribute mark_debug of empty_fifo       : signal is "true"; --chfifo
+   -- attribute mark_debug of dcount_chfifo    : signal is "true";
+   -- attribute mark_debug of last_ch_count    : signal is "true";
+   -- attribute mark_debug of nospace_flag     : signal is "true";
+   -- attribute mark_debug of busy_fifo        : signal is "true";
+   -- attribute mark_debug of dready_fifo      : signal is "true";
+
+  -- Trigger Search --
+   -- attribute mark_debug of state_search       : signal is "true";
+   -- attribute mark_debug of cstop_issued       : signal is "true";
+   -- attribute mark_debug of coarse_counter     : signal is "true";
+   -- attribute mark_debug of coarse_counter_buf : signal is "true";
+   -- attribute mark_debug of busy_process       : signal is "true";
+   -- attribute mark_debug of data_bit           : signal is "true";
+   -- attribute mark_debug of data_bit_buf       : signal is "true";
+   -- attribute mark_debug of we_endevent        : signal is "true";
+
+  -- event build --
+   -- attribute mark_debug of state_build : signal is "true";
+   -- attribute mark_debug of n_of_word   : signal is "true";
+   -- attribute mark_debug of local_index : signal is "true"; --evsum
+   -- attribute mark_debug of adc_ch      : signal is "true";
+
+  -- Block Buffer --
+   -- attribute mark_debug of re_block_buffer     : signal is "true";
+   -- attribute mark_debug of rv_block_buffer     : signal is "true";
+   -- attribute mark_debug of we_block_buffer     : signal is "true";
+   -- attribute mark_debug of pgfull_block_buffer : signal is "true";
+   -- attribute mark_debug of full_block_buffer   : signal is "true";
+   -- attribute mark_debug of empty_bbuffer       : signal is "true"; --block buffer
+
+  -- Event Summary FIFO --
+   -- attribute mark_debug of din_block_buffer_buf : signal is "true";
+   -- attribute mark_debug of we_evsum             : signal is "true";
+   -- attribute mark_debug of re_evsum             : signal is "true";
+   -- attribute mark_debug of rv_evsum             : signal is "true";
+   -- attribute mark_debug of full_block           : signal is "true";
+   -- attribute mark_debug of afull_block          : signal is "true";
+   -- attribute mark_debug of empty_block          : signal is "true"; --evsum
+   -- attribute mark_debug of data_ready           : signal is "true";
+
+   -- attribute mark_debug of busyAdc  : signal is "true";
+   -- attribute mark_debug of tdc_hit  : signal is "true";
+   -- attribute mark_debug of adc_data : signal is "true";
 
 begin
   -- ========================================================================
@@ -274,7 +331,7 @@ begin
 
   -- signal connection ------------------------------------------------------
   busyAdc         <= busy_adc;
-  busy_adc        <= full_flag OR pgfull_flag OR busy_fifo OR full_block OR afull_block OR busy_process;
+  busy_adc        <= full_flag OR pgfull_flag OR busy_fifo OR full_block_buffer OR full_block OR afull_block OR busy_process;
 
   -- builder bus --
   -- At present, just rename
@@ -380,6 +437,20 @@ begin
       doutb   => rb_out  -- TODO
       );
 
+  -- delay ring buffer valid -------------------------------
+  u_RingReadAlign : process(clkSys, rst)
+  begin
+    if(rst = '1') then
+      rv_ringbuf_buf     <= '0';
+      coarse_counter_buf <= (others => '0');
+      data_bit_buf       <= '0';
+    elsif(clkSys'event AND clkSys = '1') then
+      rv_ringbuf_buf     <= rv_ringbuf;
+      coarse_counter_buf <= coarse_counter;
+      data_bit_buf       <= data_bit;
+    end if;
+  end process;
+
   -- from ringbuffer to chfifo -----------------------------
   u_buf_ring2chfifo : process(clkSys, rst)
   begin
@@ -390,8 +461,8 @@ begin
       end loop;
     elsif(clkSys'event AND clkSys = '1') then
       for i in 0 to kNumAdcInputBlock-1 loop
-        bufd_ring2chfifo(i)   <= data_bit & coarse_counter & rb_out(kNumAdcBit*(i+1)-1 downto kNumAdcBit*i);
-        bufwe_ring2chfifo(i)  <= (rv_ringbuf AND (NOT pgfull_fifo(i))) OR we_endevent;
+        bufd_ring2chfifo(i)   <= data_bit_buf & coarse_counter_buf & rb_out(kNumAdcBit*(i+1)-1 downto kNumAdcBit*i);
+        bufwe_ring2chfifo(i)  <= (rv_ringbuf_buf AND (NOT full_fifo(i))) OR we_endevent;
       end loop;
     end if;
   end process u_buf_ring2chfifo;
@@ -415,8 +486,9 @@ begin
     elsif(clkSys'event AND clkSys = '1') then
       for i in 0 to kNumAdcInputBlock-1 loop
         last_ch_count(i)    <= std_logic_vector(kMaxAdcChDepth - unsigned(dcount_chfifo(i)));
+        reserved_data_count(i) <= resize(unsigned(reg_adc.window_max) - unsigned(reg_adc.window_min), kWidthAdcChDataCount) + to_unsigned(2 + kMaxAdcChThreshold, kWidthAdcChDataCount);
         --if(unsigned(last_ch_count(i)) <= to_unsigned(kMaxChThreshold, kWidthChDataCount)) then
-        if(unsigned(last_ch_count(i)) <= kMaxAdcChThreshold) then
+        if(unsigned(last_ch_count(i)) < reserved_data_count(i)) then
           nospace_flag(i) <= '1';
         else
           nospace_flag(i) <= '0';
@@ -456,7 +528,7 @@ begin
       wr_en       => we_block_buffer,
       rd_en       => re_block_buffer,
       dout        => dout_block_buffer,
-      full        => open,
+      full        => full_block_buffer,
       empty       => empty_bbuffer,
       valid       => rv_block_buffer,
       prog_full   => pgfull_block_buffer
@@ -502,7 +574,7 @@ begin
 
       data_bit          <= '0';
       lastword_count    <= (others => '0');
-      finalize_count    <= '0';
+      we_endevent       <= '0';
       state_search         <= Init;
     elsif(clkSys'event AND clkSys = '1') then
       case state_search is
@@ -516,7 +588,7 @@ begin
 
           data_bit        <= isSeparator;
           lastword_count  <= (others => '0');
-          finalize_count  <= '0';
+          we_endevent     <= '0';
           state_search    <= WaitCommonStop;
 
         when WaitCommonStop =>
@@ -551,18 +623,13 @@ begin
           lastword_count        <= std_logic_vector(unsigned(lastword_count) -1);
           if(lastword_count = "000") then
             we_endevent         <= '1';
-            finalize_count      <= '1';
             state_search        <= Finalize;
           end if;
 
         when Finalize =>
           read_ptr      <= read_ptr;
-          if(finalize_count = '1') then
-            finalize_count  <= '0';
-          else
-            we_endevent     <= '0';
-            state_search    <= Done;
-          end if;
+          we_endevent     <= '0';
+          state_search    <= Done;
 
         when Done =>
           busy_process    <= '0';
@@ -577,15 +644,36 @@ begin
 
 
   -- Build one event in this block ------------------------------------------
+  u_ChFifoReadControl : process(rst, local_index, state_build, empty_fifo, pgfull_block_buffer, rv_raw_chfifo, dout_chfifo)
+    variable id : integer range 0 to kNumAdcInputBlock-1;
+  begin
+    re_chfifo <= (others => '0');
+
+    if(rst = '0') then
+      id := to_integer(unsigned(local_index));
+
+      if((state_build = ReadInterval or
+          state_build = ReadOneChannel) and
+         empty_fifo(id) = '0' and
+         pgfull_block_buffer = '0' and
+         not(state_build = ReadOneChannel and
+             rv_raw_chfifo(id) = '1' and
+             dout_chfifo(id)(kIndexAdcDataBit) = isSeparator)) then
+
+        re_chfifo(id) <= '1';
+      end if;
+    end if;
+  end process u_ChFifoReadControl;
+
   u_BuildProcess : process(rst, clkSys)
     variable id : integer;
   begin
     if(rst = '1') then
+      we_block_buffer     <= '0';
+      we_block_buffer_buf <= '0';
       local_index       <= (others => '0');
-      re_chfifo         <= (others => '0');
       n_of_word         <= (others => '0');
       we_evsum          <= '0';
-      we_ok_to_blbuffer <= '1';
       adc_ch            <= std_logic_vector(unsigned(offset_ch) + kNumAdcInputBlock-1);
       state_build       <= Init;
     elsif(clkSys'event AND clkSys = '1') then
@@ -593,22 +681,19 @@ begin
 
       din_block_buffer_buf  <= magicWord & adc_ch & "00" & dout_chfifo(id)(kIndexAdcDataBit-1 downto 0);
       din_block_buffer      <= din_block_buffer_buf;
-      we_block_buffer_buf   <= we_ok_to_blbuffer AND read_valid(id);
+      we_block_buffer_buf   <= read_valid(id);
       we_block_buffer       <= we_block_buffer_buf;
 
       case state_build is
         when Init =>
           local_index   <= (others => '0');
-          re_chfifo     <= (others => '0');
           n_of_word     <= (others => '0');
           we_evsum      <= '0';
-          we_ok_to_blbuffer     <= '1';
           adc_ch        <= std_logic_vector(unsigned(offset_ch) + kNumAdcInputBlock-1);
           state_build   <= WaitDready;
 
         when WaitDready =>
           if(dready_fifo = '1' and pgfull_block_buffer = '0') then
-            we_ok_to_blbuffer <= '1';
             adc_ch        <= std_logic_vector(unsigned(offset_ch) + kNumAdcInputBlock-1);
             local_index   <= std_logic_vector(to_unsigned(kNumAdcInputBlock-1, kWidthAdcChIndex));
             state_build   <= DreadyInterval;
@@ -618,16 +703,18 @@ begin
           state_build     <= StartPosition;
 
         when StartPosition =>
-          re_chfifo(id)   <= '1';
-          state_build     <= ReadInterval;
+          if((empty_fifo(id) = '0') AND (pgfull_block_buffer = '0')) then
+            state_build     <= ReadInterval;
+          end if;
 
         when ReadInterval =>
-          state_build     <= ReadOneChannel;
+          if((empty_fifo(id) = '0') AND (pgfull_block_buffer = '0')) then
+            state_build     <= ReadOneChannel;
+          end if;
 
         when ReadOneChannel =>
           if(rv_raw_chfifo(id) = '1') then
             if(dout_chfifo(id)(kIndexAdcDataBit) = isSeparator) then
-              re_chfifo(id)   <= '0';
               local_index     <= std_logic_vector(unsigned(local_index) -1);
               state_build     <= EndOneChannel;
 
@@ -637,7 +724,6 @@ begin
           end if;
 
         when EndOneChannel =>
-          we_ok_to_blbuffer <= '1';
           adc_ch            <= std_logic_vector(unsigned(local_index) + unsigned(offset_ch));
           if(unsigned(local_index) = kNumAdcInputBlock-1) then
             state_build <= Finalize;
