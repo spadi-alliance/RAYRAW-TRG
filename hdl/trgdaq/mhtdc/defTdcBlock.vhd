@@ -18,6 +18,9 @@ package defTdcBlock is
   constant kNumInputBlock     : integer:= 32;
   constant kNumBitMagicWord   : positive:= 8;
 
+  constant kWidthTdcSampleId  : positive:= 16;
+  constant kWidthTdcEventId   : positive:= 10;
+
   -- Ring buffer --
   constant kWidthRingData     : positive:= kWidthFineCount +1;
   constant kIndexHit          : positive:= 4;

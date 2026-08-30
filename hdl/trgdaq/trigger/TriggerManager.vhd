@@ -56,7 +56,10 @@ entity TriggerManager is
     dataLocalBusOut	  : out LocalBusOutType;
     reLocalBus		    : in std_logic;
     weLocalBus		    : in std_logic;
-    readyLocalBus	    : out std_logic
+    readyLocalBus	    : out std_logic;
+
+    -- Event Id --
+    eventIdOut          : out std_logic_vector(kWidthEventId-1 downto 0)
     );
 end TriggerManager;
 
@@ -129,11 +132,33 @@ architecture RTL of TriggerManager is
 
   -- trigger signals -----------------------------------------------------
   signal count_busy   : std_logic_vector(kWidthBusyCount-1 downto 0);
+  signal trm_event_id : std_logic_vector(kWidthEventId-1 downto 0);
 
   -- debug
---  attribute mark_debug of self_busy : signal is "TRUE";
---  attribute mark_debug of seq_busy : signal is "TRUE";
---  attribute mark_debug of fifo_busy : signal is "TRUE";
+  -- attribute mark_debug of self_busy : signal is "TRUE";
+  -- attribute mark_debug of seq_busy : signal is "TRUE";
+  -- attribute mark_debug of fifo_busy : signal is "TRUE";
+  -- attribute mark_debug of full_fifo : signal is "TRUE";
+  -- attribute mark_debug of afull_fifo : signal is "TRUE";
+  -- attribute mark_debug of pgfull_fifo : signal is "TRUE";
+  -- attribute mark_debug of empty_trig_record : signal is "TRUE";
+  -- attribute mark_debug of data_ready : signal is "TRUE";
+  -- attribute mark_debug of state_busy : signal is "TRUE";
+  -- attribute mark_debug of count_busy : signal is "TRUE";
+  -- attribute mark_debug of L1_req : signal is "TRUE";
+  -- attribute mark_debug of L1_trigger : signal is "TRUE";
+  -- attribute mark_debug of L1_one_shot : signal is "TRUE";
+  -- attribute mark_debug of L2_trigger : signal is "TRUE";
+  -- attribute mark_debug of L2_one_shot : signal is "TRUE";
+  -- attribute mark_debug of level2_detect : signal is "TRUE";
+  -- attribute mark_debug of level2_detect_delay : signal is "TRUE";
+  -- attribute mark_debug of extL1       : signal is "TRUE";
+  -- attribute mark_debug of L1_trigger_sync : signal is "TRUE";
+  -- attribute mark_debug of din_trig_record : signal is "TRUE";
+  -- attribute mark_debug of dout_trig_record : signal is "TRUE";
+  -- attribute mark_debug of dInTRM      : signal is "TRUE";
+  -- attribute mark_debug of dOutTRM     : signal is "TRUE";
+  -- attribute mark_debug of trm_event_id : signal is "TRUE";
 
 -- ================================= body ==================================
 begin
@@ -278,6 +303,20 @@ begin
     valid       => dOutTRM.rvFifo,
     prog_full   => pgfull_fifo
     );
+
+  -- Event Id ----------------------------------------------------------------
+  eventIdOut <= trm_event_id;
+
+  u_EventId : process(clk, sync_reset)
+  begin
+    if(sync_reset = '1') then
+      trm_event_id <= (others => '0');
+    elsif(clk'event AND clk = '1') then
+      if(L1_one_shot = '1') then
+        trm_event_id <= std_logic_vector(unsigned(trm_event_id) + 1);
+      end if;
+    end if;
+  end process;
 
   -- Self busy ---------------------------------------------------------------
   u_SelfBusyProcess : process( clk, sync_reset)

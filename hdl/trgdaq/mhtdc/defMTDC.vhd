@@ -13,6 +13,9 @@ package defMTDC is
   constant kMagicWordLeading  : std_logic_vector(kNumBitMagicWord-1 downto 0):= X"cc";
   constant kMagicWordTrailing : std_logic_vector(kNumBitMagicWord-1 downto 0):= X"cd";
 
+  type TdcEventIdArray is array(integer range kNumTdcBlock-1 downto 0)
+   of std_logic_vector(kWidthTdcEventId-1 downto 0);
+
   -- Self trigger ---------------------------------------------------------
   constant kWidthSelfHitThreshold : positive := 6;
   constant kSelfLatchWindowMax    : positive := 15;

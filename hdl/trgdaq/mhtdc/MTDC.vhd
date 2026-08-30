@@ -46,8 +46,16 @@ entity MTDC is
     -- Self trigger --
     selfTrig            : out std_logic;
 
-    -- tdc hit --
-    tdcHit              : out std_logic_vector(kNumInputBlock-1 downto 0)
+    -- Tdc hit --
+    tdcLeadingHitOut    : out std_logic_vector(kNumInputBlock-1 downto 0);
+    tdcTrailingHitOut   : out std_logic_vector(kNumInputBlock-1 downto 0);
+
+    -- Sample Id --
+    tdcSampleIdOut      : out std_logic_vector(kWidthTdcSampleId-1 downto 0);
+
+    -- Event Id --
+    eventIdIn           : in std_logic_vector(kWidthTdcEventId-1 downto 0);
+    eventIdOut          : out std_logic_vector(kWidthTdcEventId-1 downto 0)
     );
 end MTDC;
 
@@ -66,6 +74,10 @@ architecture RTL of MTDC is
 
   signal sig_cstop  : std_logic_vector(kWidthStopData-1 downto 0);
 
+  signal tdc_sample_id     : std_logic_vector(kWidthTdcSampleId-1 downto 0);
+
+  signal tdc_event_id      : std_logic_vector(kWidthTdcEventId-1 downto 0);
+
   -- Local bus controll -----------------------------------------------------
   signal state_lbus	  : BusProcessType;
   signal enable_block : std_logic_vector(kNumTdcBlock-1 downto 0);
@@ -74,6 +86,7 @@ architecture RTL of MTDC is
 
   -- Self trigger -----------------------------------------------------------
   signal hit_found_leading  : std_logic_vector(kNumInputBlock-1 downto 0);
+  signal hit_found_trailing : std_logic_vector(kNumInputBlock-1 downto 0);
   signal self_hit_count     : unsigned(5 downto 0);
   signal self_trig_flag     : std_logic;
   signal self_trig_pulse    : std_logic;
@@ -108,7 +121,7 @@ architecture RTL of MTDC is
     end if;
     return pass;
   end function;
-
+  
   -- debug ------------------------------------------------------------------
   --attribute mark_debug of sig_cstop : signal is "true";
   -- attribute mark_debug of selfTrig           : signal is "true";
@@ -170,7 +183,10 @@ begin
         isBoundToBuilder    => isBoundToBuilder(i),
 
         -- Self trigger --
-        hitFoundOut => hit_found_leading
+        hitFoundOut  => hit_found_leading,
+
+        -- Event Id --
+        tdcEventIdIn => tdc_event_id
         );
   end generate;
 
@@ -206,7 +222,10 @@ begin
         isBoundToBuilder    => isBoundToBuilder(i+1),
 
         -- Self trigger --
-        hitFoundOut => open
+        hitFoundOut  => hit_found_trailing,
+
+        -- Event Id --
+        tdcEventIdIn => tdc_event_id
         );
   end generate;
 
@@ -220,6 +239,22 @@ begin
       stopIn      => triggerIn.L1accept,
       dOutStop    => sig_cstop
       );
+
+  tdcSampleIdOut   <= tdc_sample_id;
+  eventIdOut        <= tdc_event_id;
+
+  u_SampleId : process(clk, sync_reset)
+  begin
+    if(sync_reset = '1') then
+      tdc_sample_id   <= (others => '0');
+      tdc_event_id    <= (others => '0');
+    elsif(clk'event AND clk = '1') then
+      tdc_sample_id <= std_logic_vector(unsigned(tdc_sample_id) + 1);
+      if(sig_cstop(kIndexHit) = '1') then
+        tdc_event_id <= eventIdIn;
+      end if;
+    end if;
+  end process;
 
   -- Local bus process -----------------------------------------------------
   u_BusProcess : process(clk, sync_reset)
@@ -402,7 +437,8 @@ begin
   u_reset_gen : entity mylib.ResetGen
     port map(rst, clk, sync_reset);
 
-  tdcHit <= hit_found_leading;
+  tdcLeadingHitOut  <= hit_found_leading;
+  tdcTrailingHitOut <= hit_found_trailing;
   -- Self trigger --
   u_self_trigger : process(sync_reset, clk)
     variable cnt      : unsigned(5 downto 0);
@@ -446,6 +482,5 @@ begin
       reg_self_trig_flag <= self_trig_flag;
     end if;
   end process;
-
 
 end RTL;

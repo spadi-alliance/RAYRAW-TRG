@@ -152,6 +152,8 @@ architecture Behavioral of toplevel is
   signal reg_evb2trm              : dataEvb2Trm;
   signal trigger_out              : TrigDownType;
 
+  signal trm_event_id             : std_logic_vector(mylib.defTRM.kWidthEventId-1 downto 0);
+
   -- DCT -----------------------------------------------------------------------------------
   signal daq_gate                 : std_logic;
   signal evb_reset_from_DCT       : std_logic;
@@ -161,8 +163,12 @@ architecture Behavioral of toplevel is
   signal tdc_busy       : std_logic;
   signal data_tdc_bbus  : BBusDataTDC;
 
-  signal self_trig_nim  : std_logic;
-  signal TdcHit         : std_logic_vector(kNumInput-1 downto 0);
+  signal self_trig_nim    : std_logic;
+  signal tdc_leading_hit  : std_logic_vector(kNumInput-1 downto 0);
+  signal tdc_trailing_hit : std_logic_vector(kNumInput-1 downto 0);
+
+  signal tdc_sample_id    : std_logic_vector(kWidthTdcSampleId-1 downto 0);
+  signal tdc_event_id     : std_logic_vector(kWidthTdcEventId-1 downto 0);
 
   -- ADC ---------------------------------------------------------------------
   signal adc_busy         : std_logic;
@@ -503,7 +509,10 @@ begin
       dataLocalBusOut     => data_LocalBusOut(kTRM.ID),
       reLocalBus          => re_LocalBus(kTRM.ID),
       weLocalBus          => we_LocalBus(kTRM.ID),
-      readyLocalBus       => ready_LocalBus(kTRM.ID)
+      readyLocalBus       => ready_LocalBus(kTRM.ID),
+
+      -- Event Id --
+      eventIdOut          => trm_event_id
       );
 
   -- DCT -------------------------------------------------------------------------------
@@ -567,7 +576,15 @@ begin
       selfTrig            => self_trig_nim,
 
       -- Hit info --
-      tdcHit              => TdcHit
+      tdcLeadingHitOut     => tdc_leading_hit,
+      tdcTrailingHitOut    => tdc_trailing_hit,
+
+      -- Tdc Id --
+      tdcSampleIdOut       => tdc_sample_id,
+
+      -- Event Id --
+      eventIdIn            => trm_event_id,
+      eventIdOut           => tdc_event_id
       );
 
   -- ADC -------------------------------------------------------------------------------
@@ -610,7 +627,14 @@ begin
       readyLocalBus       => ready_LocalBus(kADC.ID),
 
       -- Tdc hit --
-      tdc_hit             => TdcHit
+      tdcLeadingHitIn     => tdc_leading_hit,
+      tdcTrailingHitIn    => tdc_trailing_hit,
+
+      -- Sample Id --
+      tdcSampleIdIn       => tdc_sample_id,
+
+      -- Event Id --
+      eventIdIn           => tdc_event_id
       );
 
   -- IOM -------------------------------------------------------------------------------
