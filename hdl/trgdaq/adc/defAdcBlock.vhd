@@ -34,12 +34,6 @@ package defAdcBlock is
   type TdcHitDelayArray is array(0 to kDelayTdcHit-1)
     of std_logic_vector(kNumAdcInputBlock-1 downto 0);
 
-  -- hit delay --
-  constant kDelayTdcHit       : positive:= 10;
-
-  type TdcHitDelayArray is array(0 to kDelayTdcHit-1)
-    of std_logic_vector(kNumAdcInputBlock-1 downto 0);
-
   -- channel buffer --
   constant kWidthAdcChDataCount  : positive:= 12;
   constant kMaxAdcChDepth        : positive:= 4096;
