@@ -22,6 +22,7 @@ entity TriggerManager is
     extClear 		      : in std_logic;
     extL1		          : in std_logic;
     extL2		          : in std_logic;
+    extTAG            : in std_logic_vector(kWidthTAG-1 downto 0);
 
     -- J0 trigger --
     j0Clear		        : in std_logic;
@@ -36,6 +37,12 @@ entity TriggerManager is
     rmL2              : in std_logic;
     rmTAG             : in std_logic_vector(kWidthTAG-1 downto 0);
 
+    -- Self trigger --
+    selfClear         : in std_logic;
+    selfL1            : in std_logic;
+    selfL2            : in std_logic;
+    selfTAG           : in std_logic_vector(kWidthTAG-1 downto 0);
+
     -- module input --
     dInTRM            : in dataEvb2Trm;
 
@@ -49,7 +56,10 @@ entity TriggerManager is
     dataLocalBusOut	  : out LocalBusOutType;
     reLocalBus		    : in std_logic;
     weLocalBus		    : in std_logic;
-    readyLocalBus	    : out std_logic
+    readyLocalBus	    : out std_logic;
+
+    -- Event Id --
+    eventIdOut          : out std_logic_vector(kWidthEventId-1 downto 0)
     );
 end TriggerManager;
 
@@ -81,7 +91,7 @@ architecture RTL of TriggerManager is
   signal fast_clear_one_shot                      : std_logic;
   signal masked_clear				: std_logic_vector(kNumOfTrigType-1 downto 0);
 
-  signal tag_sel                                  : std_logic_vector(1 downto 0);
+  signal tag_sel                                  : std_logic_vector(kWidthTAG-1 downto 0);
   signal tag_out, masked_tag, buf_tag1, buf_tag2  : std_logic_vector(kWidthTAG-1 downto 0);
 
   signal module_ready				                      : std_logic;
@@ -122,11 +132,33 @@ architecture RTL of TriggerManager is
 
   -- trigger signals -----------------------------------------------------
   signal count_busy   : std_logic_vector(kWidthBusyCount-1 downto 0);
+  signal trm_event_id : std_logic_vector(kWidthEventId-1 downto 0);
 
   -- debug
---  attribute mark_debug of self_busy : signal is "TRUE";
---  attribute mark_debug of seq_busy : signal is "TRUE";
---  attribute mark_debug of fifo_busy : signal is "TRUE";
+  -- attribute mark_debug of self_busy : signal is "TRUE";
+  -- attribute mark_debug of seq_busy : signal is "TRUE";
+  -- attribute mark_debug of fifo_busy : signal is "TRUE";
+  -- attribute mark_debug of full_fifo : signal is "TRUE";
+  -- attribute mark_debug of afull_fifo : signal is "TRUE";
+  -- attribute mark_debug of pgfull_fifo : signal is "TRUE";
+  -- attribute mark_debug of empty_trig_record : signal is "TRUE";
+  -- attribute mark_debug of data_ready : signal is "TRUE";
+  -- attribute mark_debug of state_busy : signal is "TRUE";
+  -- attribute mark_debug of count_busy : signal is "TRUE";
+  -- attribute mark_debug of L1_req : signal is "TRUE";
+  -- attribute mark_debug of L1_trigger : signal is "TRUE";
+  -- attribute mark_debug of L1_one_shot : signal is "TRUE";
+  -- attribute mark_debug of L2_trigger : signal is "TRUE";
+  -- attribute mark_debug of L2_one_shot : signal is "TRUE";
+  -- attribute mark_debug of level2_detect : signal is "TRUE";
+  -- attribute mark_debug of level2_detect_delay : signal is "TRUE";
+  -- attribute mark_debug of extL1       : signal is "TRUE";
+  -- attribute mark_debug of L1_trigger_sync : signal is "TRUE";
+  -- attribute mark_debug of din_trig_record : signal is "TRUE";
+  -- attribute mark_debug of dout_trig_record : signal is "TRUE";
+  -- attribute mark_debug of dInTRM      : signal is "TRUE";
+  -- attribute mark_debug of dOutTRM     : signal is "TRUE";
+  -- attribute mark_debug of trm_event_id : signal is "TRUE";
 
 -- ================================= body ==================================
 begin
@@ -150,7 +182,8 @@ begin
 
   masked_L1	<=  (j0L1     and reg_sel_trig(kL1J0.Index)) &
                 (extL1    and reg_sel_trig(kL1Ext.Index)) &
-                (rmL1     and reg_sel_trig(kL1RM.Index));
+                (rmL1     and reg_sel_trig(kL1RM.Index)) &
+                (selfL1   and reg_sel_trig(kL1Self.Index));
 
   -- make L2 trigger ---------------------------------------------------------
   L2_req	    <= '0' when masked_L2 = kTrigAllZero else '1';
@@ -158,7 +191,8 @@ begin
 
   masked_L2	<= (j0L2     and reg_sel_trig(kL2J0.Index)) &
                (extL2    and reg_sel_trig(kL2Ext.Index)) &
-               (rmL2     and reg_sel_trig(kL2RM.Index));
+               (rmL2     and reg_sel_trig(kL2RM.Index)) &
+               (selfL2   and reg_sel_trig(kL2Self.Index));
 
   -- make clear --------------------------------------------------------------
   clear_req	  <= '0' when masked_clear = kTrigAllZero else '1';
@@ -166,12 +200,21 @@ begin
 
   masked_clear	<= (J0Clear     and reg_sel_trig(kClrJ0.Index)) &
                    (ExtClear    and reg_sel_trig(kClrExt.Index)) &
-                   (RMClear     and reg_sel_trig(kClrRM.Index));
+                   (RMClear     and reg_sel_trig(kClrRM.Index)) &
+                   (selfClear   and reg_sel_trig(kClrSelf.Index));
 
-  -- make J0 tag -------------------------------------------------------------
-  tag_sel     <= reg_sel_trig(kEnJ0.Index) & reg_sel_trig(kEnRM.Index);
-  masked_tag	<= J0TAG when tag_sel = "10" else
-                 RMTAG when tag_sel = "01" else
+  -- make trigger tag --------------------------------------------------------
+  -- tag_sel keeps active and enabled trigger sources.
+  -- Bit order is (J0, Ext, RM, Self), same as masked_L1/L2.
+  tag_sel     <= masked_L2 when reg_sel_trig(kEnL2.Index) = '1' else
+                 masked_L1;  -- 将来的には"0000"に
+
+  -- Priority when multiple triggers are active at once:
+  -- Ext > J0 > RM > Self.
+  masked_tag	<= ExtTAG when tag_sel(2) = '1' else
+                 J0TAG when tag_sel(3) = '1' else
+                 RMTAG when tag_sel(1) = '1' else
+                 SelfTAG when tag_sel(0) = '1' else
                  "0000";
 
   u_reg_tag : process(clk, sync_reset)
@@ -250,7 +293,7 @@ begin
     clk         => clk,
     rst         => sync_reset,
     din         => din_trig_record,
-    wr_en       => level2_detect_delay(kNumL2Delay-1),
+    wr_en       => level2_detect_delay(kNumL2Delay-1), -- AND reg_sel_trig(kEnL2.Index)
     rd_en       => dInTRM.reFifo,
     dout        => dout_trig_record,
     full        => full_fifo,
@@ -259,6 +302,20 @@ begin
     valid       => dOutTRM.rvFifo,
     prog_full   => pgfull_fifo
     );
+
+  -- Event Id ----------------------------------------------------------------
+  eventIdOut <= trm_event_id;
+
+  u_EventId : process(clk, sync_reset)
+  begin
+    if(sync_reset = '1') then
+      trm_event_id <= (others => '0');
+    elsif(clk'event AND clk = '1') then
+      if(L1_one_shot = '1') then
+        trm_event_id <= std_logic_vector(unsigned(trm_event_id) + 1);
+      end if;
+    end if;
+  end process;
 
   -- Self busy ---------------------------------------------------------------
   u_SelfBusyProcess : process( clk, sync_reset)
@@ -329,7 +386,7 @@ begin
               if( addrLocalBus(kMultiByte'range) = k1stbyte) then
                 dataLocalBusOut   <= reg_sel_trig(7 downto 0);
               else
-                dataLocalBusOut   <= "0000" & reg_sel_trig(kWidthSelTrig-1 downto 8);
+                dataLocalBusOut   <= reg_sel_trig(kWidthSelTrig-1 downto 8);
               end if;
             when others =>
               dataLocalBusOut	<= X"ff";

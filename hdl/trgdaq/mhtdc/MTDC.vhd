@@ -46,8 +46,16 @@ entity MTDC is
     -- Self trigger --
     selfTrig            : out std_logic;
 
-    -- tdc hit --
-    tdcHit              : out std_logic_vector(kNumInputBlock-1 downto 0)
+    -- Tdc hit --
+    tdcLeadingHitOut    : out std_logic_vector(kNumInputBlock-1 downto 0);
+    tdcTrailingHitOut   : out std_logic_vector(kNumInputBlock-1 downto 0);
+
+    -- Sample Id --
+    tdcSampleIdOut      : out std_logic_vector(kWidthTdcSampleId-1 downto 0);
+
+    -- Event Id --
+    eventIdIn           : in std_logic_vector(kWidthTdcEventId-1 downto 0);
+    eventIdOut          : out std_logic_vector(kWidthTdcEventId-1 downto 0)
     );
 end MTDC;
 
@@ -66,26 +74,19 @@ architecture RTL of MTDC is
 
   signal sig_cstop  : std_logic_vector(kWidthStopData-1 downto 0);
 
+  signal tdc_sample_id     : std_logic_vector(kWidthTdcSampleId-1 downto 0);
+
+  signal tdc_event_id      : std_logic_vector(kWidthTdcEventId-1 downto 0);
+
   -- Local bus controll -----------------------------------------------------
   signal state_lbus	  : BusProcessType;
   signal enable_block : std_logic_vector(kNumTdcBlock-1 downto 0);
   signal en_block     : std_logic_vector(kNumTdcBlock-1 downto 0);
-  signal reg_tdc      : regTdc;
-
-  -- Hit condition ----------------------------------------------------------
-  signal self_hit_threshold_vio : std_logic_vector(5 downto 0);
-  signal self_latch_window_vio  : std_logic_vector(kWidthSelfLatchWindowBit-1 downto 0);
-
-  COMPONENT vio_tdc_self
-    PORT (
-      clk : IN STD_LOGIC;
-      probe_out0 : OUT STD_LOGIC_VECTOR(5 downto 0);
-      probe_out1 : OUT STD_LOGIC_VECTOR(kWidthSelfLatchWindowBit-1 downto 0)
-    );
-  END COMPONENT;
+  signal reg_tdc      : regMTDC;
 
   -- Self trigger -----------------------------------------------------------
   signal hit_found_leading  : std_logic_vector(kNumInputBlock-1 downto 0);
+  signal hit_found_trailing : std_logic_vector(kNumInputBlock-1 downto 0);
   signal self_hit_count     : unsigned(5 downto 0);
   signal self_trig_flag     : std_logic;
   signal self_trig_pulse    : std_logic;
@@ -104,17 +105,23 @@ architecture RTL of MTDC is
     return cnt;
   end function;
 
-  function pass_geometry(hit : HitVector) return std_logic is
+  function pass_geometry(hit : HitVector; geo_count : std_logic_vector; geo_mask : SelfGeoMaskArray) return std_logic is
     variable pass : std_logic := '0';
   begin
-    for i in 0 to kNumSelfGeoNum-1 loop
-      if((hit and kSelfGeoMask(i)) = kSelfGeoMask(i)) then
-        pass := '1';
-      end if;
-    end loop;
+    if(unsigned(geo_count) = 0) then
+      pass := '1';
+    else
+      for i in 0 to kNumSelfGeoMax-1 loop
+        if(i < to_integer(unsigned(geo_count))) then
+          if((unsigned(geo_mask(i)) /= 0) AND ((hit AND geo_mask(i)) = geo_mask(i))) then
+            pass := '1';
+          end if;
+        end if;
+      end loop;
+    end if;
     return pass;
   end function;
-
+  
   -- debug ------------------------------------------------------------------
   --attribute mark_debug of sig_cstop : signal is "true";
   -- attribute mark_debug of selfTrig           : signal is "true";
@@ -132,14 +139,6 @@ begin
   -- ========================================================================
   -- Self trigger -----------------------------------------------------------
   selfTrig <= self_trig_pulse;
-
-  -- Hit condition vio ------------------------------------------------------
-  u_VIO_TDC_SELF : vio_tdc_self
-  port map (
-    clk        => clk,
-    probe_out0 => self_hit_threshold_vio,
-    probe_out1 => self_latch_window_vio
-  );
 
   -- signal connection ------------------------------------------------------
   en_block(0) <= enable_block(0);
@@ -168,7 +167,7 @@ begin
         -- controll register --
         busyTdc     => busy(i),
         enBlock     => en_block(i),
-        regIn       => reg_tdc,
+        regIn       => reg_tdc.tdc,
 
         -- data input --
         tdcIn       => sigIn(i),
@@ -184,7 +183,10 @@ begin
         isBoundToBuilder    => isBoundToBuilder(i),
 
         -- Self trigger --
-        hitFoundOut => hit_found_leading
+        hitFoundOut  => hit_found_leading,
+
+        -- Event Id --
+        tdcEventIdIn => tdc_event_id
         );
   end generate;
 
@@ -204,7 +206,7 @@ begin
         -- controll register --
         busyTdc     => busy(i+1),
         enBlock     => en_block(i+1),
-        regIn       => reg_tdc,
+        regIn       => reg_tdc.tdc,
 
         -- data input --
         tdcIn       => sig_in_n(i),
@@ -220,7 +222,10 @@ begin
         isBoundToBuilder    => isBoundToBuilder(i+1),
 
         -- Self trigger --
-        hitFoundOut => open
+        hitFoundOut  => hit_found_trailing,
+
+        -- Event Id --
+        tdcEventIdIn => tdc_event_id
         );
   end generate;
 
@@ -235,16 +240,37 @@ begin
       dOutStop    => sig_cstop
       );
 
+  tdcSampleIdOut   <= tdc_sample_id;
+  eventIdOut        <= tdc_event_id;
+
+  u_SampleId : process(clk, sync_reset)
+  begin
+    if(sync_reset = '1') then
+      tdc_sample_id   <= (others => '0');
+      tdc_event_id    <= (others => '0');
+    elsif(clk'event AND clk = '1') then
+      tdc_sample_id <= std_logic_vector(unsigned(tdc_sample_id) + 1);
+      if(sig_cstop(kIndexHit) = '1') then
+        tdc_event_id <= eventIdIn;
+      end if;
+    end if;
+  end process;
+
   -- Local bus process -----------------------------------------------------
   u_BusProcess : process(clk, sync_reset)
+    variable geometry_index : integer range 0 to kNumSelfGeoMax-1;
   begin
     if(sync_reset = '1') then
       dataLocalBusOut     <= x"00";
       readyLocalBus       <= '0';
       enable_block        <= (others => '0');
-      reg_tdc.offset_ptr  <= (others => '0');
-      reg_tdc.window_max  <= (others => '0');
-      reg_tdc.window_min  <= (others => '0');
+      reg_tdc.tdc.offset_ptr  <= (others => '0');
+      reg_tdc.tdc.window_max  <= (others => '0');
+      reg_tdc.tdc.window_min  <= (others => '0');
+      reg_tdc.hit_threshold   <= (others => '0');
+      reg_tdc.latch_window    <= (others => '0');
+      reg_tdc.geometry_count  <= (others => '0');
+      reg_tdc.geometry_mask   <= (others => (others => '0'));
       state_lbus    <= Init;
     elsif(clk'event and clk = '1') then
       case state_lbus is
@@ -271,29 +297,59 @@ begin
 
             when kOfsPtr(kNonMultiByte'range) =>
               if(addrLocalBus(kMultiByte'range) = k1stbyte) then
-                reg_tdc.offset_ptr(7 downto 0)  <= dataLocalBusIn;
+                reg_tdc.tdc.offset_ptr(7 downto 0)  <= dataLocalBusIn;
               elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
-                reg_tdc.offset_ptr(kWidthCoarseCount-1 downto 8)  <= dataLocalBusIn(kWidthCoarseCount-1-8 downto 0);
+                reg_tdc.tdc.offset_ptr(kWidthCoarseCount-1 downto 8)  <= dataLocalBusIn(kWidthCoarseCount-1-8 downto 0);
               else
               end if;
 
             when kWinMax(kNonMultiByte'range) =>
               if(addrLocalBus(kMultiByte'range) = k1stbyte) then
-                reg_tdc.window_max(7 downto 0)  <= dataLocalBusIn;
+                reg_tdc.tdc.window_max(7 downto 0)  <= dataLocalBusIn;
               elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
-                reg_tdc.window_max(kWidthCoarseCount-1 downto 8)  <= dataLocalBusIn(kWidthCoarseCount-1-8 downto 0);
+                reg_tdc.tdc.window_max(kWidthCoarseCount-1 downto 8)  <= dataLocalBusIn(kWidthCoarseCount-1-8 downto 0);
               else
               end if;
 
             when kWinMin(kNonMultiByte'range) =>
               if(addrLocalBus(kMultiByte'range) = k1stbyte) then
-                reg_tdc.window_min(7 downto 0)  <= dataLocalBusIn;
+                reg_tdc.tdc.window_min(7 downto 0)  <= dataLocalBusIn;
               elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
-                reg_tdc.window_min(kWidthCoarseCount-1 downto 8)  <= dataLocalBusIn(kWidthCoarseCount-1-8 downto 0);
+                reg_tdc.tdc.window_min(kWidthCoarseCount-1 downto 8)  <= dataLocalBusIn(kWidthCoarseCount-1-8 downto 0);
               else
               end if;
 
-            when others => null;
+            when kSelfHitThreshold(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                reg_tdc.hit_threshold <= dataLocalBusIn(kWidthSelfHitThreshold-1 downto 0);
+              end if;
+
+            when kSelfHitLatchWin(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                reg_tdc.latch_window <= dataLocalBusIn(kWidthSelfLatchWindow-1 downto 0);
+              end if;
+
+            when kSelfGeoCount(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                reg_tdc.geometry_count <= dataLocalBusIn(kWidthSelfGeoCount-1 downto 0);
+              end if;
+
+            when others =>
+              if((to_integer(unsigned(addrLocalBus(kNonMultiByte'range))) >= to_integer(unsigned(kSelfGeoMaskBase(kNonMultiByte'range))))
+               AND (to_integer(unsigned(addrLocalBus(kNonMultiByte'range))) < to_integer(unsigned(kSelfGeoMaskBase(kNonMultiByte'range))) + kNumSelfGeoMax)) then
+                geometry_index := to_integer(unsigned(addrLocalBus(kNonMultiByte'range))) - to_integer(unsigned(kSelfGeoMaskBase(kNonMultiByte'range)));
+
+                if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                  reg_tdc.geometry_mask(geometry_index)(7 downto 0) <= dataLocalBusIn;
+                elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
+                  reg_tdc.geometry_mask(geometry_index)(15 downto 8) <= dataLocalBusIn;
+                elsif(addrLocalBus(kMultiByte'range) = k3rdbyte) then
+                  reg_tdc.geometry_mask(geometry_index)(23 downto 16) <= dataLocalBusIn;
+                elsif(addrLocalBus(kMultiByte'range) = k4thbyte) then
+                  reg_tdc.geometry_mask(geometry_index)(31 downto 24) <= dataLocalBusIn;
+                else
+                end if;
+              end if;
           end case;
           state_lbus    <= Done;
 
@@ -304,30 +360,63 @@ begin
 
             when kOfsPtr(kNonMultiByte'range) =>
               if(addrLocalBus(kMultiByte'range) = k1stbyte) then
-                dataLocalBusOut <= reg_tdc.offset_ptr(7 downto 0);
+                dataLocalBusOut <= reg_tdc.tdc.offset_ptr(7 downto 0);
               elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
-                dataLocalBusOut <= "00000" & reg_tdc.offset_ptr(kWidthCoarseCount-1 downto 8);
+                dataLocalBusOut <= "00000" & reg_tdc.tdc.offset_ptr(kWidthCoarseCount-1 downto 8);
               else
               end if;
 
             when kWinMax(kNonMultiByte'range) =>
               if(addrLocalBus(kMultiByte'range) = k1stbyte) then
-                dataLocalBusOut <= reg_tdc.window_max(7 downto 0);
+                dataLocalBusOut <= reg_tdc.tdc.window_max(7 downto 0);
               elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
-                dataLocalBusOut <= "00000" & reg_tdc.window_max(kWidthCoarseCount-1 downto 8);
+                dataLocalBusOut <= "00000" & reg_tdc.tdc.window_max(kWidthCoarseCount-1 downto 8);
               else
               end if;
 
             when kWinMin(kNonMultiByte'range) =>
               if(addrLocalBus(kMultiByte'range) = k1stbyte) then
-                dataLocalBusOut <= reg_tdc.window_min(7 downto 0);
+                dataLocalBusOut <= reg_tdc.tdc.window_min(7 downto 0);
               elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
-                dataLocalBusOut <= "00000" & reg_tdc.window_min(kWidthCoarseCount-1 downto 8);
+                dataLocalBusOut <= "00000" & reg_tdc.tdc.window_min(kWidthCoarseCount-1 downto 8);
+              else
+              end if;
+
+            when kSelfHitThreshold(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                dataLocalBusOut <= "00" & reg_tdc.hit_threshold(kWidthSelfHitThreshold-1 downto 0);
+              else
+              end if;
+
+            when kSelfHitLatchWin(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                dataLocalBusOut <= "0000" & reg_tdc.latch_window(kWidthSelfLatchWindow-1 downto 0);
+              else
+              end if;
+
+            when kSelfGeoCount(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                dataLocalBusOut <= "000" & reg_tdc.geometry_count(kWidthSelfGeoCount-1 downto 0);
               else
               end if;
 
             when others =>
-              dataLocalBusOut <= x"ff";
+              if((to_integer(unsigned(addrLocalBus(kNonMultiByte'range))) >= to_integer(unsigned(kSelfGeoMaskBase(kNonMultiByte'range))))
+               AND (to_integer(unsigned(addrLocalBus(kNonMultiByte'range))) < to_integer(unsigned(kSelfGeoMaskBase(kNonMultiByte'range))) + kNumSelfGeoMax)) then
+                geometry_index := to_integer(unsigned(addrLocalBus(kNonMultiByte'range))) - to_integer(unsigned(kSelfGeoMaskBase(kNonMultiByte'range)));
+
+                if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                  dataLocalBusOut <= reg_tdc.geometry_mask(geometry_index)(7 downto 0);
+                elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
+                  dataLocalBusOut <= reg_tdc.geometry_mask(geometry_index)(15 downto 8);
+                elsif(addrLocalBus(kMultiByte'range) = k3rdbyte) then
+                  dataLocalBusOut <= reg_tdc.geometry_mask(geometry_index)(23 downto 16);
+                elsif(addrLocalBus(kMultiByte'range) = k4thbyte) then
+                  dataLocalBusOut <= reg_tdc.geometry_mask(geometry_index)(31 downto 24);
+                else
+                  dataLocalBusOut <= x"ff";
+                end if;
+              end if;
           end case;
           state_lbus    <= Done;
 
@@ -348,10 +437,12 @@ begin
   u_reset_gen : entity mylib.ResetGen
     port map(rst, clk, sync_reset);
 
-  tdcHit <= hit_found_leading;
+  tdcLeadingHitOut  <= hit_found_leading;
+  tdcTrailingHitOut <= hit_found_trailing;
   -- Self trigger --
   u_self_trigger : process(sync_reset, clk)
-    variable cnt : unsigned(5 downto 0);
+    variable cnt      : unsigned(5 downto 0);
+    variable hit_eval : HitVector;
   begin
     if(sync_reset = '1') then
       self_hit_count     <= (others => '0');
@@ -363,7 +454,7 @@ begin
     elsif(clk'event AND clk = '1') then
       for ch in 0 to kNumInputBlock-1 loop
         if(hit_found_leading(ch) = '1') then
-          hit_latch_count(ch) <= unsigned(self_latch_window_vio);
+          hit_latch_count(ch) <= unsigned(reg_tdc.latch_window);
           hit_latch(ch)       <= '1';
         elsif(hit_latch_count(ch) > 1) then
           hit_latch_count(ch) <= hit_latch_count(ch) - 1;
@@ -372,22 +463,22 @@ begin
           hit_latch_count(ch) <= hit_latch_count(ch) - 1;
           hit_latch(ch)       <= '0';
         else
-          hit_latch_count(ch) <= to_unsigned(0, kWidthSelfLatchWindowBit);
+          hit_latch_count(ch) <= (others => '0');
           hit_latch(ch)       <= '0';
         end if;
       end loop;
 
-      cnt := count_hit(hit_latch);
+      hit_eval := hit_latch or hit_found_leading;
+      cnt := count_hit(hit_eval);
       self_hit_count <= cnt;
 
-      if((cnt >= unsigned(self_hit_threshold_vio)) and (unsigned(self_hit_threshold_vio) /= 0) and (pass_geometry(hit_latch) = '1')) then
-      -- if((cnt >= unsigned(self_hit_threshold_vio)) and (unsigned(self_hit_threshold_vio) /= 0)) then
+      if((cnt >= unsigned(reg_tdc.hit_threshold)) AND (unsigned(reg_tdc.hit_threshold) /= 0) AND (pass_geometry(hit_eval, reg_tdc.geometry_count, reg_tdc.geometry_mask) = '1')) then
         self_trig_flag <= '1';
       else
         self_trig_flag <= '0';
       end if;
 
-      self_trig_pulse    <= (self_trig_flag) and (not reg_self_trig_flag);
+      self_trig_pulse    <= (self_trig_flag) AND (not reg_self_trig_flag);
       reg_self_trig_flag <= self_trig_flag;
     end if;
   end process;

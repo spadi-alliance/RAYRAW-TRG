@@ -54,7 +54,14 @@ entity AdcBlock is
     readyLocalBus       : out std_logic;
 
     -- Tdc hit --
-    tdc_hit              : in std_logic_vector(kNumAdcInputBlock-1 downto 0)
+    tdcLeadingHitIn     : in std_logic_vector(kNumAdcInputBlock-1 downto 0);
+    tdcTrailingHitIn    : in std_logic_vector(kNumAdcInputBlock-1 downto 0);
+
+    -- Sample Id --
+    tdcSampleIdIn      : in std_logic_vector(kWidthAdcSampleId-1 downto 0);
+
+    -- Event Id --
+    eventIdIn           : in std_logic_vector(kWidthAdcEventId-1 downto 0)
 
     );
 end AdcBlock;
@@ -65,6 +72,9 @@ architecture RTL of AdcBlock is
 
   -- internal signals -------------------------------------------------------
   signal busy_adc     : std_logic;
+
+  signal adc_event_id  : std_logic_vector(kWidthAdcEventId-1 downto 0);
+  signal adc_sample_id : std_logic_vector(kWidthAdcSampleId-1 downto 0);
 
   -- builder bus control --
   signal state_bbus                           : BBusSlaveType;
@@ -87,6 +97,11 @@ architecture RTL of AdcBlock is
   signal tap_value_frame_in     : std_logic_vector(kNumTapBit-1 downto 0);
   signal en_ext_tapin       : std_logic_vector(0 downto 0);
   signal adcro_is_ready     : std_logic_vector(kNumAsicBlock-1 downto 0);
+  signal adc_bitslip_err    : std_logic_vector(kNumAsicBlock-1 downto 0);
+  signal adc_valid          : std_logic_vector(kNumAsicBlock-1 downto 0);
+  signal adc_frame          : AdcFrameBlockArray;
+  signal adc_all_ready      : std_logic;
+  signal adc_any_bitslip    : std_logic;
   -- signal clk_adc          : std_logic_vector(kNumASIC-1 downto 0);
   -- signal gclk_adc         : std_logic_vector(kNumASIC-1 downto 0);
   signal adc_data           : AdcDataBlockArray; -- 32 * 10
@@ -126,6 +141,54 @@ architecture RTL of AdcBlock is
       doutb   : OUT STD_LOGIC_VECTOR(kNumAdcBit*kNumAdcInputBlock-1 downto 0) -- 32*10
       );
   END COMPONENT;
+
+  -- Hit buffer --
+  signal state_hit_build : HitBuildStateArray;
+
+  signal active_leading_sample_id   : HitSampleArray;
+
+  signal din_hitbuf   : HitIntervalArray;
+  signal dout_hitbuf  : HitIntervalArray;
+  signal we_hitbuf    : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+  signal re_hitbuf    : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+  signal full_hitbuf  : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+  signal empty_hitbuf : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+  signal rv_hitbuf    : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+
+  COMPONENT hit_buffer
+    PORT (
+      clk       : IN STD_LOGIC;
+      rst       : IN STD_LOGIC;
+      din       : IN STD_LOGIC_VECTOR(2*kWidthAdcSampleId-1 downto 0);
+      wr_en     : IN STD_LOGIC;
+      rd_en     : IN STD_LOGIC;
+      dout      : OUT STD_LOGIC_VECTOR(2*kWidthAdcSampleId-1 downto 0);
+      full      : OUT STD_LOGIC;
+      empty     : OUT STD_LOGIC;
+      valid     : OUT STD_LOGIC
+    );
+  END COMPONENT;
+
+  signal close_hit_valid : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+  signal close_hit_data  : HitIntervalArray;
+
+  signal current_hit_interval : HitIntervalArray;
+  signal current_hit_valid    : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+  signal next_hit_interval    : HitIntervalArray;
+  signal next_hit_valid       : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+
+  signal read_pending : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+
+  signal event_hit_mask       : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+  signal reg_event_hit_mask   : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+  signal hit_overflow         : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+  signal overflow_leading_id  : HitSampleArray;
+  signal overflow_trailing_id : HitSampleArray;
+
+  signal channel_write_mask   : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+
+  signal timeout_hit_valid : std_logic_vector(kNumAdcInputBlock-1 downto 0);
+  signal timeout_hit_seen  : std_logic_vector(kNumAdcInputBlock-1 downto 0);
 
   -- channel buffer ----------------------------------------------
   signal we_chfifo              : std_logic_vector(kNumAdcInputBlock -1 downto 0);
@@ -246,8 +309,27 @@ architecture RTL of AdcBlock is
   END COMPONENT;
 
   -- debug ------------------------------------------------------------------
+   -- attribute mark_debug of busyAdc            : signal is "true";
+   -- attribute mark_debug of adc_data           : signal is "true";
+   -- attribute mark_debug of adcro_is_ready     : signal is "true";
+   -- attribute mark_debug of adc_bitslip_err    : signal is "true";
+   -- attribute mark_debug of adc_frame          : signal is "true";
+   -- attribute mark_debug of adc_valid          : signal is "true";
+   -- attribute mark_debug of adc_ro_reset       : signal is "true";
+   -- attribute mark_debug of tap_value_in       : signal is "true";
+   -- attribute mark_debug of tap_value_frame_in : signal is "true";
+   -- attribute mark_debug of en_ext_tapin       : signal is "true";
+   -- attribute mark_debug of adc_ro_reset_vio   : signal is "true";
+   -- attribute mark_debug of reg_adc_ro_reset   : signal is "true";
+   -- attribute mark_debug of adc_all_ready      : signal is "true";
+   -- attribute mark_debug of adc_any_bitslip    : signal is "true";
+   -- attribute mark_debug of tdcLeadingHitIn    : signal is "true";
+   -- attribute mark_debug of tdcTrailingHitIn   : signal is "true";
+   -- attribute mark_debug of tdcSampleIdIn      : signal is "true";
+   -- attribute mark_debug of cStop              : signal is "true";
   -- Internal signals --
-   attribute mark_debug of busy_adc            : signal is "true";
+   -- attribute mark_debug of busy_adc            : signal is "true";
+   -- attribute mark_debug of adc_sample_id       : signal is "true";
    -- attribute mark_debug of state_bbus          : signal is "true";
    -- attribute mark_debug of dout_bbus           : signal is "true";
    -- attribute mark_debug of re_bbus             : signal is "true";
@@ -264,6 +346,37 @@ architecture RTL of AdcBlock is
    -- attribute mark_debug of rv_ringbuf_buf : signal is "true";
    -- attribute mark_debug of rb_out         : signal is "true";
    -- attribute mark_debug of read_ptr       : signal is "true";
+
+  -- Hit Buffer --
+   -- attribute mark_debug of we_hitbuf       : signal is "true";
+   -- attribute mark_debug of re_hitbuf       : signal is "true";
+   -- attribute mark_debug of rv_hitbuf       : signal is "true";
+   -- attribute mark_debug of empty_hitbuf    : signal is "true";
+   -- attribute mark_debug of full_hitbuf     : signal is "true";
+   -- attribute mark_debug of close_hit_valid : signal is "true";
+   -- attribute mark_debug of close_hit_data  : signal is "true";
+
+  -- Hit Search --
+  -- Hit build --
+   -- attribute mark_debug of state_hit_build          : signal is "true";
+   -- attribute mark_debug of active_leading_sample_id : signal is "true";
+   -- attribute mark_debug of timeout_hit_valid        : signal is "true";
+   -- attribute mark_debug of timeout_hit_seen         : signal is "true";
+
+  -- Hit Queue --
+   -- attribute mark_debug of current_hit_valid    : signal is "true";
+   -- attribute mark_debug of current_hit_interval : signal is "true";
+   -- attribute mark_debug of next_hit_valid       : signal is "true";
+   -- attribute mark_debug of next_hit_interval    : signal is "true";
+   -- attribute mark_debug of read_pending         : signal is "true";
+   -- attribute mark_debug of hit_overflow         : signal is "true";
+   -- attribute mark_debug of overflow_leading_id  : signal is "true";
+   -- attribute mark_debug of overflow_trailing_id : signal is "true";
+   -- attribute mark_debug of channel_write_mask   : signal is "true";
+
+  -- Hit window --
+   -- attribute mark_debug of event_hit_mask     : signal is "true";
+   -- attribute mark_debug of reg_event_hit_mask : signal is "true";
 
   -- Channel Buffer --
    -- attribute mark_debug of we_chfifo         : signal is "true";
@@ -282,6 +395,7 @@ architecture RTL of AdcBlock is
    -- attribute mark_debug of dcount_chfifo    : signal is "true";
    -- attribute mark_debug of last_ch_count    : signal is "true";
    -- attribute mark_debug of nospace_flag     : signal is "true";
+   -- attribute mark_debug of reserved_data_count : signal is "true";
    -- attribute mark_debug of busy_fifo        : signal is "true";
    -- attribute mark_debug of dready_fifo      : signal is "true";
 
@@ -319,19 +433,20 @@ architecture RTL of AdcBlock is
    -- attribute mark_debug of empty_block          : signal is "true"; --evsum
    -- attribute mark_debug of data_ready           : signal is "true";
 
-   -- attribute mark_debug of busyAdc  : signal is "true";
-   -- attribute mark_debug of tdc_hit  : signal is "true";
-   -- attribute mark_debug of adc_data : signal is "true";
-
 begin
   -- ========================================================================
   -- body
   -- ========================================================================
+  adc_all_ready <= and_reduce(adcro_is_ready);
+  adc_any_bitslip <= or_reduce(adc_bitslip_err);
+  
   offset_ch   <= std_logic_vector(to_unsigned(initCh, 5)); -- TODO: redefine kWidthAdcChannel for ADC
 
   -- signal connection ------------------------------------------------------
   busyAdc         <= busy_adc;
   busy_adc        <= full_flag OR pgfull_flag OR busy_fifo OR full_block_buffer OR full_block OR afull_block OR busy_process;
+
+  adc_sample_id   <= std_logic_vector(unsigned(tdcSampleIdIn) + to_unsigned(kDelayTdcHit, kWidthAdcSampleId));
 
   -- builder bus --
   -- At present, just rename
@@ -359,6 +474,7 @@ begin
       cstop_issued    <= '0';
     elsif(clkSys'event AND clkSys = '1') then
       cstop_issued    <= cStop;
+      adc_event_id    <= eventIdIn;
     end if;
   end process;
 
@@ -391,13 +507,13 @@ begin
 
       -- Status --
       isReady       => adcro_is_ready,
-      bitslipErr    => open,
+      bitslipErr    => adc_bitslip_err,
       clkAdc        => open, -- clk_adc (later gclk_adc)
 
       -- Data Out --
-      validOut      => open,
+      validOut      => adc_valid,
       adcDataOut    => adc_data,
-      adcFrameOut   => open,
+      adcFrameOut   => adc_frame,
 
       -- ADC In --
       adcDClkP      => ADC_DCLK_P,
@@ -437,6 +553,258 @@ begin
       doutb   => rb_out  -- TODO
       );
 
+  -- instance of Hit buffer ----------------------------------
+  gen_Hitfifo : for i in 0 to kNumAdcInputBlock-1 generate
+    timeout_hit_valid(i) <= '1' when((state_hit_build(i) = WaitTrailing) AND (((unsigned(adc_sample_id) - unsigned(active_leading_sample_id(i))) >= unsigned(reg_adc.hit_timeout)))) else '0';
+    close_hit_valid(i)   <= '1' when((state_hit_build(i) = WaitTrailing) AND ((tdcTrailingHitIn(i) = '1') OR (timeout_hit_valid(i) = '1'))) else '0';
+    close_hit_data(i)    <= active_leading_sample_id(i) & adc_sample_id;
+
+    u_Hitfifo : hit_buffer
+      port map (
+        clk     => clkSys,
+        rst     => rst,
+        din     => din_hitbuf(i),
+        wr_en   => we_hitbuf(i),
+        rd_en   => re_hitbuf(i),
+        dout    => dout_hitbuf(i),
+        full    => full_hitbuf(i),
+        empty   => empty_hitbuf(i),
+        valid   => rv_hitbuf(i)
+      );
+  end generate;
+
+  -- Hit build process -------------------------------
+  gen_HitBuild : for i in 0 to kNumAdcInputBlock-1 generate
+    u_HitBuild : process(clkSys, rst)
+    begin
+      if(rst = '1') then
+        active_leading_sample_id(i) <= (others => '0');
+        state_hit_build(i)          <= WaitLeading;
+        timeout_hit_seen(i)         <= '0';
+      elsif(clkSys'event AND clkSys = '1') then
+        case state_hit_build(i) is
+          when WaitLeading =>
+            if(tdcLeadingHitIn(i) = '1') then
+              active_leading_sample_id(i) <= adc_sample_id;
+              state_hit_build(i)          <= WaitTrailing;
+            end if;
+
+          when WaitTrailing =>
+            if(tdcTrailingHitIn(i) = '1') then
+              if(tdcLeadingHitIn(i) = '0') then
+                state_hit_build(i)          <= WaitLeading;
+              else
+                active_leading_sample_id(i) <= adc_sample_id;
+                state_hit_build(i)          <= WaitTrailing;
+              end if;
+            elsif(timeout_hit_valid(i) = '1') then
+              timeout_hit_seen(i) <= '1';
+              if(tdcLeadingHitIn(i) = '1') then
+                active_leading_sample_id(i) <= adc_sample_id;
+                state_hit_build(i)          <= WaitTrailing;
+              else
+                state_hit_build (i)         <= WaitLeading;
+              end if;
+            end if;
+        end case;
+      end if;
+    end process;
+  end generate;
+
+  -- Hit Queue --
+  gen_HitQueue : for i in 0 to kNumAdcInputBlock-1 generate
+    u_HitQueue : process(clkSys, rst)
+      variable cur_data       : std_logic_vector(2*kWidthAdcSampleId-1 downto 0);
+      variable next_data      : std_logic_vector(2*kWidthAdcSampleId-1 downto 0);
+      variable cur_valid      : std_logic;
+      variable next_valid     : std_logic;
+      variable pending        : std_logic;
+
+      variable ov_valid       : std_logic;
+      variable ov_leading     : std_logic_vector(kWidthAdcSampleId-1 downto 0);
+      variable ov_trailing    : std_logic_vector(kWidthAdcSampleId-1 downto 0);
+
+      variable trailing_age   : unsigned(kWidthAdcSampleId-1 downto 0);
+      variable window_max_age : unsigned(kWidthAdcSampleId-1 downto 0);
+
+      variable fifo_has_older : boolean;
+      variable drop_new_hit   : boolean;
+    begin
+      if(rst = '1') then
+        current_hit_interval(i) <= (others => '0');
+        next_hit_interval(i)    <= (others => '0');
+        current_hit_valid(i)    <= '0';
+        next_hit_valid(i)       <= '0';
+        read_pending(i)         <= '0';
+
+        din_hitbuf(i)           <= (others => '0');
+        we_hitbuf(i)            <= '0';
+        re_hitbuf(i)            <= '0';
+
+        hit_overflow(i)         <= '0';
+        overflow_leading_id(i)  <= (others => '0');
+        overflow_trailing_id(i) <= (others => '0');
+      elsif(clkSys'event AND clkSys = '1') then
+        cur_data   := current_hit_interval(i);
+        next_data  := next_hit_interval(i);
+        cur_valid  := current_hit_valid(i);
+        next_valid := next_hit_valid(i);
+        pending    := read_pending(i);
+
+        ov_valid    := hit_overflow(i);
+        ov_leading  := overflow_leading_id(i);
+        ov_trailing := overflow_trailing_id(i);
+
+        window_max_age := resize(unsigned(reg_adc.window_max), kWidthAdcSampleId);
+
+        we_hitbuf(i) <= '0';
+        re_hitbuf(i) <= '0';
+        drop_new_hit := false;
+
+        if(ov_valid = '1') then
+          trailing_age := unsigned(adc_sample_id) - unsigned(ov_trailing);
+          if(trailing_age >= window_max_age) then
+            ov_valid := '0';
+          end if;
+        end if;
+
+        if(cur_valid = '1') then
+          trailing_age := unsigned(adc_sample_id) - unsigned(cur_data(kWidthAdcSampleId-1 downto 0));
+          if(trailing_age >= window_max_age) then
+            cur_valid := '0';
+          end if;
+        end if;
+
+        if((cur_valid = '0') AND (next_valid = '1')) then
+          cur_data   := next_data;
+          cur_valid  := '1';
+          next_valid := '0';
+        end if;
+
+        if(rv_hitbuf(i) = '1') then
+          pending := '0';
+          trailing_age := unsigned(adc_sample_id) - unsigned(dout_hitbuf(i)(kWidthAdcSampleId-1 downto 0));
+
+          if(trailing_age < window_max_age) then
+            if(cur_valid = '0') then
+              cur_data  := dout_hitbuf(i);
+              cur_valid := '1';
+            elsif(next_valid = '0') then
+              next_data  := dout_hitbuf(i);
+              next_valid := '1';
+            end if;
+          end if;
+        end if;
+
+        fifo_has_older := (empty_hitbuf(i) = '0') OR (pending = '1') OR (we_hitbuf(i) = '1');
+
+        if(close_hit_valid(i) = '1') then
+          if((not fifo_has_older) AND (cur_valid = '0')) then
+            cur_data  := close_hit_data(i);
+            cur_valid := '1';
+          elsif((not fifo_has_older) AND (next_valid = '0')) then
+            next_data  := close_hit_data(i);
+            next_valid := '1';
+          elsif(full_hitbuf(i) = '0') then
+            din_hitbuf(i) <= close_hit_data(i);
+            we_hitbuf(i)  <= '1';
+          else
+            drop_new_hit := true;
+          end if;
+        end if;
+
+        if((next_valid = '0') AND (pending = '0') AND (empty_hitbuf(i) = '0')) then
+          re_hitbuf(i) <= '1';
+          pending      := '1';
+        end if;
+
+        if(drop_new_hit) then
+          if(ov_valid = '0') then
+            ov_leading := close_hit_data(i)(2*kWidthAdcSampleId-1 downto kWidthAdcSampleId);
+          end if;
+          ov_trailing := close_hit_data(i)(kWidthAdcSampleId-1 downto 0);
+          ov_valid    := '1';
+        end if;
+
+        current_hit_interval(i) <= cur_data;
+        next_hit_interval(i)    <= next_data;
+        current_hit_valid(i)    <= cur_valid;
+        next_hit_valid(i)       <= next_valid;
+        read_pending(i)         <= pending;
+
+        hit_overflow(i)         <= ov_valid;
+        overflow_leading_id(i)  <= ov_leading;
+        overflow_trailing_id(i) <= ov_trailing;
+      end if;
+    end process;
+  end generate;
+
+  -- Hit Window Check --
+  u_HitWindowCheck : process(clkSys, rst)
+    variable window_min_age     : unsigned(kWidthAdcSampleId-1 downto 0);
+    variable window_max_age     : unsigned(kWidthAdcSampleId-1 downto 0);
+    variable active_leading_age : unsigned(kWidthAdcSampleId-1 downto 0);
+    variable leading_age        : unsigned(kWidthAdcSampleId-1 downto 0);
+    variable trailing_age       : unsigned(kWidthAdcSampleId-1 downto 0);
+  begin
+    if(rst = '1') then
+      event_hit_mask <= (others => '0');
+    elsif(clkSys 'event AND clkSys = '1') then
+      window_min_age := resize(unsigned(reg_adc.window_min), kWidthAdcSampleId);
+      window_max_age := resize(unsigned(reg_adc.window_max), kWidthAdcSampleId);
+      event_hit_mask <= (others => '0');
+      for i in 0 to kNumAdcInputBlock-1 loop
+        if(current_hit_valid(i) = '1') then
+          leading_age  := unsigned(adc_sample_id) - unsigned(current_hit_interval(i)(2*kWidthAdcSampleId-1 downto kWidthAdcSampleId));
+          trailing_age := unsigned(adc_sample_id) - unsigned(current_hit_interval(i)(kWidthAdcSampleId-1 downto 0));
+
+          if((leading_age >= window_min_age) AND (trailing_age < window_max_age)) then
+            event_hit_mask(i) <= '1';
+          elsif(trailing_age >= window_max_age) then
+            if(next_hit_valid(i) = '1') then
+              leading_age  := unsigned(adc_sample_id) - unsigned(next_hit_interval(i)(2*kWidthAdcSampleId-1 downto kWidthAdcSampleId));
+              trailing_age := unsigned(adc_sample_id) - unsigned(next_hit_interval(i)(kWidthAdcSampleId-1 downto 0));
+
+              if((leading_age >= window_min_age) AND (trailing_age < window_max_age)) then
+                event_hit_mask(i) <= '1';
+              elsif((trailing_age >= window_max_age) AND ((read_pending(i) = '1') OR (rv_hitbuf(i) = '1') OR (empty_hitbuf(i) = '0'))) then
+                event_hit_mask(i) <= '1';
+              end if;
+            elsif((read_pending(i) = '1') OR (rv_hitbuf(i) = '1') OR (empty_hitbuf(i) = '0')) then
+              event_hit_mask(i) <= '1';
+            end if;
+          end if;
+        elsif(next_hit_valid(i) = '1') then
+          leading_age  := unsigned(adc_sample_id) - unsigned(next_hit_interval(i)(2*kWidthAdcSampleId-1 downto kWidthAdcSampleId));
+          trailing_age := unsigned(adc_sample_id) - unsigned(next_hit_interval(i)(kWidthAdcSampleId-1 downto 0));
+
+          if((leading_age >= window_min_age) AND (trailing_age < window_max_age)) then
+            event_hit_mask(i) <= '1';
+          elsif((trailing_age >= window_max_age) AND ((read_pending(i) = '1') OR (rv_hitbuf(i) = '1') OR (empty_hitbuf(i) = '0'))) then
+            event_hit_mask(i) <= '1';
+          end if;
+        elsif((read_pending(i) = '1') OR (rv_hitbuf(i) = '1') OR (empty_hitbuf(i) = '0')) then
+          event_hit_mask(i) <= '1';
+        end if;
+
+        if(state_hit_build(i) = WaitTrailing) then
+          active_leading_age := unsigned(adc_sample_id) - unsigned(active_leading_sample_id(i));
+          if(active_leading_age >= window_min_age) then
+            event_hit_mask(i) <= '1';
+          end if;
+        end if;
+
+        if(hit_overflow(i) = '1') then
+          leading_age  := unsigned(adc_sample_id) - unsigned(overflow_leading_id(i));
+          trailing_age := unsigned(adc_sample_id) - unsigned(overflow_trailing_id(i));
+          if((leading_age >= window_min_age) AND (trailing_age < window_max_age)) then
+            event_hit_mask(i) <= '1';
+          end if;
+        end if;
+      end loop;
+    end if;
+  end process;
+
   -- delay ring buffer valid -------------------------------
   u_RingReadAlign : process(clkSys, rst)
   begin
@@ -462,7 +830,7 @@ begin
     elsif(clkSys'event AND clkSys = '1') then
       for i in 0 to kNumAdcInputBlock-1 loop
         bufd_ring2chfifo(i)   <= data_bit_buf & coarse_counter_buf & rb_out(kNumAdcBit*(i+1)-1 downto kNumAdcBit*i);
-        bufwe_ring2chfifo(i)  <= (rv_ringbuf_buf AND (NOT full_fifo(i))) OR we_endevent;
+        bufwe_ring2chfifo(i) <= ((rv_ringbuf_buf AND channel_write_mask(i)) OR we_endevent) AND (NOT full_fifo(i));
       end loop;
     end if;
   end process u_buf_ring2chfifo;
@@ -477,21 +845,38 @@ begin
   busy_fifo   <= '0' when(unsigned(nospace_flag) = 0) else '1';
 
   u_dcount : process(rst, clkSys)
+    variable free_words     : unsigned(kWidthAdcChDataCount downto 0);
+    variable reserved_words : unsigned(kWidthAdcChDataCount-1 downto 0);
   begin
     if(rst = '1') then
       for i in 0 to kNumAdcInputBlock-1 loop
         last_ch_count(i)   <= (others => '0');
+        reserved_data_count(i) <= to_unsigned(1 + kMaxAdcChThreshold, kWidthAdcChDataCount);
         nospace_flag(i) <= '0';
       end loop;
     elsif(clkSys'event AND clkSys = '1') then
       for i in 0 to kNumAdcInputBlock-1 loop
-        last_ch_count(i)    <= std_logic_vector(kMaxAdcChDepth - unsigned(dcount_chfifo(i)));
-        reserved_data_count(i) <= resize(unsigned(reg_adc.window_max) - unsigned(reg_adc.window_min), kWidthAdcChDataCount) + to_unsigned(2 + kMaxAdcChThreshold, kWidthAdcChDataCount);
+        if(full_fifo(i) = '1') then
+          free_words := (others => '0');
+        else
+          free_words := to_unsigned(kMaxAdcChDepth, free_words'length) - resize(unsigned(dcount_chfifo(i)), free_words'length);
+        end if;
+        if((reg_adc.enable_zerosup = '0') OR (event_hit_mask(i) = '1')) then
+          reserved_words := resize(unsigned(reg_adc.window_max) - unsigned(reg_adc.window_min), kWidthAdcChDataCount) + to_unsigned(1 + kMaxAdcChThreshold, kWidthAdcChDataCount);
+        else
+          reserved_words := to_unsigned(1 + kMaxAdcChThreshold, kWidthAdcChDataCount);
+        end if;
         --if(unsigned(last_ch_count(i)) <= to_unsigned(kMaxChThreshold, kWidthChDataCount)) then
-        if(unsigned(last_ch_count(i)) < reserved_data_count(i)) then
+        if(free_words < resize(reserved_words, free_words'length)) then
           nospace_flag(i) <= '1';
         else
           nospace_flag(i) <= '0';
+        end if;
+        reserved_data_count(i) <= reserved_words;
+        if(free_words > to_unsigned(2**kWidthAdcChDataCount-1, free_words'length)) then
+          last_ch_count(i) <= (others => '1');
+        else
+          last_ch_count(i) <= std_logic_vector(resize(free_words, kWidthAdcChDataCount));
         end if;
       end loop;
     end if;
@@ -562,11 +947,13 @@ begin
     end if;
   end process;
 
+  channel_write_mask <= (others => '1') when(reg_adc.enable_zerosup = '0') else reg_event_hit_mask;
   u_SearchProcess : process(rst, clkSys)
   begin
     if(rst = '1') then
       we_ringbuf        <= "0";
       busy_process      <= '0';
+      reg_event_hit_mask    <= (others => '0');
       --write_ptr       <= (others => '0');
       read_ptr          <= (others => '0');
       re_ringbuf        <= '0';
@@ -580,6 +967,7 @@ begin
       case state_search is
         when Init =>
           busy_process    <= '0';
+          reg_event_hit_mask <= (others => '0');
           we_ringbuf      <= "0";
           --write_ptr       <= (others => '0');
           read_ptr        <= (others => '0');
@@ -596,6 +984,7 @@ begin
           we_ringbuf      <= "1";
           if(cstop_issued = '1') then
             busy_process    <= '1';
+            reg_event_hit_mask  <= event_hit_mask;
 
             re_ringbuf      <= '1';
             data_bit        <= isData;
@@ -815,13 +1204,15 @@ begin
   u_BusProcess : process(clkSys, rst)
   begin
     if(rst = '1') then
-      dataLocalBusOut     <= x"00";
-      readyLocalBus       <= '0';
-      reg_adc.offset_ptr  <= (others => '0');
-      reg_adc.window_max  <= (others => '0');
-      reg_adc.window_min  <= (others => '0');
-      reg_adc_ro_reset    <= '1';
-      state_lbus    <= Init;
+      dataLocalBusOut        <= x"00";
+      readyLocalBus          <= '0';
+      reg_adc.offset_ptr     <= (others => '0');
+      reg_adc.window_max     <= (others => '0');
+      reg_adc.window_min     <= (others => '0');
+      reg_adc.enable_zerosup <= '0';
+      reg_adc.hit_timeout    <= std_logic_vector(to_unsigned(kHitTimeoutSamples, kWidthTimeoutSamples));
+      reg_adc_ro_reset       <= '1';
+      state_lbus             <= Init;
     elsif(clkSys'event and clkSys = '1') then
       case state_lbus is
         when Init =>
@@ -866,6 +1257,18 @@ begin
               else
               end if;
 
+            when kEnZeroSup(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                reg_adc.enable_zerosup <= dataLocalBusIn(0);
+              else
+              end if;
+
+            when kHitTimeout(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                reg_adc.hit_timeout  <= dataLocalBusIn;
+              else
+              end if;
+
             when kAdcRoReset(kNonMultiByte'range) =>
               reg_adc_ro_reset  <= dataLocalBusIn(0);
 
@@ -896,6 +1299,18 @@ begin
                 dataLocalBusOut <= reg_adc.window_min(7 downto 0);
               elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
                 dataLocalBusOut <= "00000" & reg_adc.window_min(kWidthCoarseCount-1 downto 8);
+              else
+              end if;
+
+            when kEnZeroSup(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                dataLocalBusOut <= "0000000" & reg_adc.enable_zerosup;
+              else
+              end if;
+
+            when kHitTimeout(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                dataLocalBusOut <= reg_adc.hit_timeout;
               else
               end if;
 

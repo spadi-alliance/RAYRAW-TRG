@@ -107,8 +107,8 @@ set_property PACKAGE_PIN M24 [get_ports {ASIC_DISCRI[31]}]
 
 # MISC -----------------------------------------------------------------
 set_property PACKAGE_PIN H9 [get_ports EN3V3A]
-set_property PACKAGE_PIN C22 [get_ports AMUX_ADDR[0]]
-set_property PACKAGE_PIN C24 [get_ports AMUX_ADDR[1]]
+set_property PACKAGE_PIN C22 [get_ports {AMUX_ADDR[0]}]
+set_property PACKAGE_PIN C24 [get_ports {AMUX_ADDR[1]}]
 #set_property PACKAGE_PIN C21 [get_ports TEST_POINT[0]]
 #set_property PACKAGE_PIN B26 [get_ports TEST_POINT[1]]
 #set_property PACKAGE_PIN B21 [get_ports TEST_POINT[2]]
@@ -215,14 +215,14 @@ set_property IOSTANDARD LVDS_25 [get_ports BASE_CLKP]
 set_property IOSTANDARD LVCMOS33 [get_ports USR_RSTB]
 set_property IOSTANDARD LVCMOS33 [get_ports {LED[*]}]
 set_property IOSTANDARD LVCMOS12 [get_ports {DIP[*]}]
-set_property PULLUP true [get_ports {DIP[8]}]
-set_property PULLUP true [get_ports {DIP[7]}]
-set_property PULLUP true [get_ports {DIP[6]}]
-set_property PULLUP true [get_ports {DIP[5]}]
-set_property PULLUP true [get_ports {DIP[4]}]
-set_property PULLUP true [get_ports {DIP[3]}]
-set_property PULLUP true [get_ports {DIP[2]}]
-set_property PULLUP true [get_ports {DIP[1]}]
+set_property PULLTYPE PULLUP [get_ports {DIP[8]}]
+set_property PULLTYPE PULLUP [get_ports {DIP[7]}]
+set_property PULLTYPE PULLUP [get_ports {DIP[6]}]
+set_property PULLTYPE PULLUP [get_ports {DIP[5]}]
+set_property PULLTYPE PULLUP [get_ports {DIP[4]}]
+set_property PULLTYPE PULLUP [get_ports {DIP[3]}]
+set_property PULLTYPE PULLUP [get_ports {DIP[2]}]
+set_property PULLTYPE PULLUP [get_ports {DIP[1]}]
 
 # GTX ------------------------------------------------------------------
 #set_property IOSTANDARD LVCMOS33 [get_ports SFP_SCL]
@@ -268,7 +268,7 @@ set_property IOSTANDARD LVCMOS12 [get_ports {ASIC_DISCRI[*]}]
 
 # MISC -----------------------------------------------------------------
 set_property IOSTANDARD LVCMOS33 [get_ports EN3V3A]
-set_property IOSTANDARD LVCMOS33 [get_ports AMUX_ADDR[*]]
+set_property IOSTANDARD LVCMOS33 [get_ports {AMUX_ADDR[*]}]
 #set_property IOSTANDARD LVCMOS33 [get_ports TEST_POINT[*]]
 
 # APD_BIAS -------------------------------------------------------------
@@ -285,6 +285,10 @@ set_property IOSTANDARD LVDS [get_ports {ADC_DFRAME_P[*]}]
 set_property DIFF_TERM true [get_ports {ADC_DFRAME_P[*]}]
 set_property IOSTANDARD LVDS [get_ports {ADC_DCLK_P[*]}]
 set_property DIFF_TERM true [get_ports {ADC_DCLK_P[*]}]
+
+
+
+
 
 
 

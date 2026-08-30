@@ -1,6 +1,5 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
 
 library mylib;
 use mylib.defTopLevel.all;
@@ -18,6 +17,9 @@ package defTdcBlock is
   -- Block identification --------------------------------------------------------------
   constant kNumInputBlock     : integer:= 32;
   constant kNumBitMagicWord   : positive:= 8;
+
+  constant kWidthTdcSampleId  : positive:= 16;
+  constant kWidthTdcEventId   : positive:= 10;
 
   -- Ring buffer --
   constant kWidthRingData     : positive:= kWidthFineCount +1;
@@ -76,26 +78,6 @@ package defTdcBlock is
     window_max      : std_logic_vector(kWidthCoarseCount-1 downto 0);
     window_min      : std_logic_vector(kWidthCoarseCount-1 downto 0);
   end record;
-
-  -- Self trigger --
-  constant kSelfLatchWindowMax      : natural := 15;
-  constant kWidthSelfLatchWindowBit : positive := 4;
-
-  subtype LatchCountType is unsigned(kWidthSelfLatchWindowBit-1 downto 0);
-  type LatchCountArray is array (integer range kNumInputBlock-1 downto 0) of LatchCountType;
-
-  -- Hit condition --
-  constant kNumSelfGeoNum : positive := 4;
-
-  subtype HitVector is std_logic_vector(kNumInputBlock-1 downto 0);
-  type SelfGeoMaskArray is array (0 to kNumSelfGeoNum-1) of HitVector;
-
-  constant kSelfGeoMask : SelfGeoMaskArray := (
-    0 => (0 => '1', 8 => '1', others => '0'),
-    1 => (0 => '1', 16 => '1', others => '0'),
-    2 => (0 => '1', 24 => '1', others => '0'),
-    3 => (8 => '1', 16 => '1', others => '0')
-  );
 
 end package defTdcBlock;
 

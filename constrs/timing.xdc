@@ -36,8 +36,8 @@ set_false_path -through [get_ports {LED[4]}]
 #set_false_path -through [get_nets ext_rsv2]
 set_false_path -through [get_nets seq_busy]
 set_false_path -through [get_nets module_busy]
-set_false_path -through [get_nets user_reset]
-set_false_path -through [get_nets bct_reset]
+#set_false_path -through [get_nets user_reset]
+#set_false_path -through [get_nets bct_reset]
 set_false_path -through [get_nets emergency_reset]
 #set_false_path -through [get_nets {DIP[*]}]
 set_false_path -through [get_nets {NIM_OUT[*]}]
@@ -70,10 +70,10 @@ create_generated_clock -name clk_indep [get_pins u_ClkSys_Inst/inst/mmcm_adv_ins
 create_generated_clock -name clk_spi [get_pins u_ClkSys_Inst/inst/mmcm_adv_inst/CLKOUT2]
 create_generated_clock -name clk_10mhz [get_pins u_ClkSys_Inst/inst/mmcm_adv_inst/CLKOUT3]
 
-create_generated_clock -name rclk_adc0 [get_pins u_ADC_Inst/u_ADC/gen_adc[0].u_adc/u_BUFR_inst/O]
-create_generated_clock -name rclk_adc1 [get_pins u_ADC_Inst/u_ADC/gen_adc[1].u_adc/u_BUFR_inst/O]
-create_generated_clock -name rclk_adc2 [get_pins u_ADC_Inst/u_ADC/gen_adc[2].u_adc/u_BUFR_inst/O]
-create_generated_clock -name rclk_adc3 [get_pins u_ADC_Inst/u_ADC/gen_adc[3].u_adc/u_BUFR_inst/O]
+create_generated_clock -name rclk_adc0 [get_pins {u_ADC_Inst/u_ADC/gen_adc[0].u_adc/u_BUFR_inst/O}]
+create_generated_clock -name rclk_adc1 [get_pins {u_ADC_Inst/u_ADC/gen_adc[1].u_adc/u_BUFR_inst/O}]
+create_generated_clock -name rclk_adc2 [get_pins {u_ADC_Inst/u_ADC/gen_adc[2].u_adc/u_BUFR_inst/O}]
+create_generated_clock -name rclk_adc3 [get_pins {u_ADC_Inst/u_ADC/gen_adc[3].u_adc/u_BUFR_inst/O}]
 
 set_multicycle_path -setup -from [get_clocks clk_tdc_270] -to [get_clocks clk_tdc_0] 2
 
@@ -81,5 +81,9 @@ create_generated_clock -name clk_gmii1 [get_pins u_GtClockDist_Inst/core_clockin
 create_generated_clock -name clk_gmii2 [get_pins u_GtClockDist_Inst/core_clocking_i/mmcm_adv_inst/CLKOUT1]
 
 set_clock_groups -name async_sys -asynchronous -group {clk_tdc_0 clk_tdc_90 clk_tdc_180 clk_tdc_270 clk_sys} -group clk_link -group clk_indep -group clk_spi -group clk_10mhz -group {clk_gmii1 clk_gmii2} -group rclk_adc0 -group rclk_adc1 -group rclk_adc2 -group rclk_adc3
+
+
+
+
 
 

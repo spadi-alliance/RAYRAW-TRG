@@ -105,6 +105,7 @@ architecture RTL of YaenamiAdc is
   attribute mark_debug        : boolean;
   attribute mark_debug of state_bitslip   : signal is enDEBUG;
   attribute mark_debug of state_idelay    : signal is enDEBUG;
+  attribute mark_debug of serdes_reset    : signal is enDEBUG;
 
   -- Async reg --
   attribute async_reg   : boolean;

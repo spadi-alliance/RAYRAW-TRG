@@ -39,7 +39,10 @@ entity TdcBlock is
     isBoundToBuilder    : out std_logic;
 
     -- self trigger --
-    hitFoundOut : out std_logic_vector(kNumInputBlock-1 downto 0)
+    hitFoundOut   : out std_logic_vector(kNumInputBlock-1 downto 0);
+
+    -- Event Id --
+    tdcEventIdIn  : in std_logic_vector(kWidthTdcEventId-1 downto 0)
 
     );
 end TdcBlock;
@@ -233,31 +236,31 @@ architecture RTL of TdcBlock is
 
   -- debug ------------------------------------------------------------------
   -- Ring Buffer--
-   attribute mark_debug of rb_in          : signal is "true";
-   attribute mark_debug of rv_ringbuf_pre : signal is "true";
-   attribute mark_debug of re_ringbuf     : signal is "true";
-   attribute mark_debug of rv_ringbuf     : signal is "true";
-   attribute mark_debug of read_ptr       : signal is "true";
-   attribute mark_debug of rb_out         : signal is "true";
+   -- attribute mark_debug of rb_in          : signal is "true";
+   -- attribute mark_debug of rv_ringbuf_pre : signal is "true";
+   -- attribute mark_debug of re_ringbuf     : signal is "true";
+   -- attribute mark_debug of rv_ringbuf     : signal is "true";
+   -- attribute mark_debug of read_ptr       : signal is "true";
+   -- attribute mark_debug of rb_out         : signal is "true";
 
   -- Channel Buffer --
    -- attribute mark_debug of we_chfifo     : signal is "true";
-   attribute mark_debug of reg_we_chfifo     : signal is "true";
-   attribute mark_debug of raw_we_chfifo     : signal is "true";
-   attribute mark_debug of bufwe_ring2chfifo : signal is "true";
+   -- attribute mark_debug of reg_we_chfifo     : signal is "true";
+   -- attribute mark_debug of raw_we_chfifo     : signal is "true";
+   -- attribute mark_debug of bufwe_ring2chfifo : signal is "true";
    -- attribute mark_debug of re_chfifo     : signal is "true";
-   attribute mark_debug of bufd_ring2chfifo  : signal is "true";
-   attribute mark_debug of dcount_chfifo     : signal is "true";
+   -- attribute mark_debug of bufd_ring2chfifo  : signal is "true";
+   -- attribute mark_debug of dcount_chfifo     : signal is "true";
 
   -- Hit search --
-   attribute mark_debug of state_search    : signal is "true";
-   attribute mark_debug of cstop_issued    : signal is "true";
-   attribute mark_debug of cstop_value     : signal is "true";
-   attribute mark_debug of reg_cstop_value : signal is "true";
-   attribute mark_debug of coarse_counter  : signal is "true";
+   -- attribute mark_debug of state_search    : signal is "true";
+   -- attribute mark_debug of cstop_issued    : signal is "true";
+   -- attribute mark_debug of cstop_value     : signal is "true";
+   -- attribute mark_debug of reg_cstop_value : signal is "true";
+   -- attribute mark_debug of coarse_counter  : signal is "true";
    -- attribute mark_debug of busy_process  : signal is "true";
-   attribute mark_debug of raw_tdc_value   : signal is "true";
-   attribute mark_debug of tdc_value       : signal is "true";
+   -- attribute mark_debug of raw_tdc_value   : signal is "true";
+   -- attribute mark_debug of tdc_value       : signal is "true";
 
 --   attribute mark_debug of state_daq     : signal is "true";
 --   attribute mark_debug of state_trans   : signal is "true";
