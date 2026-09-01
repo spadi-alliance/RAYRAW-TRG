@@ -5,13 +5,13 @@ use ieee.std_logic_unsigned.all;
 use mylib.defBCT.all;
 
 package defTRM is
+  constant kWidthEventId        : positive:= 10;
   -- Definition of J0 backplane trigger
   constant kWidthTAG            : positive:= 4;
 
   -- Trigger control
   constant kNumOfTrigType       : positive:= 4;
   constant kTrigAllZero         : std_logic_vector(kNumOfTrigType-1 downto 0):= "0000";
-  
   constant kWidthSelTrig        : integer := 16;
 
   subtype RegID is integer range 0 to kWidthSelTrig-1;
@@ -42,7 +42,7 @@ package defTRM is
   -- 2-5: TAG
   constant kIndexLevel2         : integer:= 0;
   constant kIndexClear          : integer:= 1;
-  
+
   constant kNumL2Delay          : positive:= 20;
   constant kWidthBusyCount      : positive:= 4;
 
@@ -59,5 +59,4 @@ package defTRM is
 
   -- Local Address --------------------------------------------------------
   constant kSelectTrigger       : LocalAddressType := x"000"; -- W/R, [11:0] -> W/R, [15:0]
-  
 end package defTRM;

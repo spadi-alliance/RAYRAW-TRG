@@ -39,7 +39,10 @@ entity TdcBlock is
     isBoundToBuilder    : out std_logic;
 
     -- self trigger --
-    hitFoundOut : out std_logic_vector(kNumInputBlock-1 downto 0)
+    hitFoundOut   : out std_logic_vector(kNumInputBlock-1 downto 0);
+
+    -- Event Id --
+    tdcEventIdIn  : in std_logic_vector(kWidthTdcEventId-1 downto 0)
 
     );
 end TdcBlock;

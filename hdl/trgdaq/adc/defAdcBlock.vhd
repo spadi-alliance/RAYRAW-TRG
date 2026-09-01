@@ -10,16 +10,33 @@ use mylib.defBCT.all;
 package defAdcBlock is
   constant kNumAdcInputBlock  : positive:= kNumAsicBlock*kNumAdcCh; -- 32: 4*8
   constant kWidthCoarseCount  : positive:= 11;
+  constant kWidthAdcSampleId  : positive:= 16;
+  constant kWidthAdcEventId   : positive:= 10;
+
+  -- Hit buffer --
+  type HitBuildProcessType is (
+    WaitLeading, WaitTrailing
+  );
+
+  type HitBuildStateArray is array(0 to kNumAdcInputBlock-1) of HitBuildProcessType;
+
+  type HitSampleArray is array(0 to kNumAdcInputBlock-1)
+   of std_logic_vector(kWidthAdcSampleId-1 downto 0);
+
+  type HitIntervalArray is array(0 to kNumAdcInputBlock-1)
+   of std_logic_vector(2*kWidthAdcSampleId-1 downto 0);
 
   -- hit delay --
-  constant kDelayTdcHit       : positive:= 10;
+  constant kDelayTdcHit         : positive:= 10;
+  constant kWidthTimeoutSamples : positive:= 8;
+  constant kHitTimeoutSamples   : positive := 200;
 
   type TdcHitDelayArray is array(0 to kDelayTdcHit-1)
     of std_logic_vector(kNumAdcInputBlock-1 downto 0);
 
   -- channel buffer --
   constant kWidthAdcChDataCount  : positive:= 12;
-  constant kMaxAdcChDepth        : positive:= 4056;
+  constant kMaxAdcChDepth        : positive:= 4096;
   constant kMaxAdcChThreshold    : positive:= 10;
   type chAdcDcountArray is array (integer range kNumAdcInputBlock-1 downto 0)
     of std_logic_vector(kWidthAdcChDataCount-1 downto 0);
@@ -62,9 +79,11 @@ package defAdcBlock is
   -- Control register --
   type regAdc is record
     --enable_block    : std_logic; -- enable this block
-    offset_ptr      : std_logic_vector(kWidthCoarseCount-1 downto 0); -- 2047 - window_max +2
-    window_max      : std_logic_vector(kWidthCoarseCount-1 downto 0);
-    window_min      : std_logic_vector(kWidthCoarseCount-1 downto 0);
+    offset_ptr     : std_logic_vector(kWidthCoarseCount-1 downto 0); -- 2047 - window_max +2
+    window_max     : std_logic_vector(kWidthCoarseCount-1 downto 0);
+    window_min     : std_logic_vector(kWidthCoarseCount-1 downto 0);
+    enable_zerosup : std_logic;
+    hit_timeout    : std_logic_vector(kWidthTimeoutSamples-1 downto 0);
   end record;
 
   -- Local Address --------------------------------------------------------
@@ -73,6 +92,8 @@ package defAdcBlock is
   constant kWinMin          : LocalAddressType := x"020"; -- W/R, [10:0], Min coarse counter
   constant kAdcRoReset      : LocalAddressType := x"030"; -- W/R, [0:0], Reset to AdcRo (default is HIGH)
   constant kIsReady         : LocalAddressType := x"040"; -- R,   [3:0], AdcRo IsReady signals
+  constant kEnZeroSup       : LocalAddressType := x"050"; -- W/R, [0:0], Zero Suppression Enable
+  constant kHitTimeout      : LocalAddressType := x"060"; -- W/R, [7:0], Hit Time out
 
   -- Region of interest ---------------------------------------------------
   constant kRoiPre          : positive:= 20; -- -> change into register [4:0]
