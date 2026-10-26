@@ -1062,7 +1062,7 @@ begin
       clkSlow             => clk_slow,
 
       -- LACCP TimeStamp --
-      timeStamp           => hbf_number(7 downto 0) & heartbeat_count,
+      timeStamp           => hbf_number(14 downto 0) & heartbeat_count(15 downto 7),
 
       -- data in --
       triggerIn           => trigger_out,
