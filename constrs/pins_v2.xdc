@@ -54,10 +54,10 @@ set_property PACKAGE_PIN E16 [get_ports {NIM_OUT[3]}]
 set_property PACKAGE_PIN F15 [get_ports {NIM_OUT[4]}]
 
 # MIKUMARI -------------------------------------------------------------
-#set_property PACKAGE_PIN AE17 [get_ports CDCM_RX_P]
-#set_property PACKAGE_PIN AF17 [get_ports CDCM_RX_N]
-#set_property PACKAGE_PIN AF14 [get_ports CDCM_TX_P]
-#set_property PACKAGE_PIN AF15 [get_ports CDCM_TX_N]
+set_property PACKAGE_PIN AE17 [get_ports MIKUMARI_RXP]
+set_property PACKAGE_PIN AF17 [get_ports MIKUMARI_RXN]
+set_property PACKAGE_PIN AF14 [get_ports MIKUMARI_TXP]
+set_property PACKAGE_PIN AF15 [get_ports MIKUMARI_TXN]
 
 # ASIC -----------------------------------------------------------------
 set_property PACKAGE_PIN AF24 [get_ports {ASIC_REFC[0]}]
@@ -254,9 +254,9 @@ set_property IOSTANDARD LVCMOS33 [get_ports {NIM_IN[*]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {NIM_OUT[*]}]
 
 # MIKUMARI -------------------------------------------------------------
-#set_property IOSTANDARD LVDS [get_ports CDCM_RX_P]
-#set_property DIFF_TERM TRUE [get_ports CDCM_RX_P]
-#set_property IOSTANDARD LVDS [get_ports CDCM_TX_P]
+set_property IOSTANDARD LVDS [get_ports MIKUMARI_RXP]
+set_property DIFF_TERM TRUE [get_ports MIKUMARI_RXP]
+set_property IOSTANDARD LVDS [get_ports MIKUMARI_TXP]
 
 # ASIC -----------------------------------------------------------------
 set_property IOSTANDARD LVCMOS12 [get_ports {ASIC_REFC[*]}]

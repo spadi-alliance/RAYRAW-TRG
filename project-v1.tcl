@@ -156,15 +156,19 @@ set files [list \
  [file normalize "${origin_dir}/ip/block_buffer_v2/block_buffer_v2.xci"] \
  [file normalize "${origin_dir}/ip/ringbuffer_bram_v1/ringbuffer_bram_v1.xci"] \
  [file normalize "${origin_dir}/ip/trigger_record_fifo/trigger_record_fifo.xci"] \
+ [file normalize "${origin_dir}/ip/data_buffer/data_buffer.xci"] \
+ [file normalize "${origin_dir}/ip/mikuts_fifo/mikuts_fifo.xci"] \
+ [file normalize "${origin_dir}/ip/mmcm_mikumari/mmcm_mikumari.xci"] \
  [file normalize "${origin_dir}/ip/hit_buffer/hit_buffer.xci"] \
  [file normalize "${origin_dir}/hdl/bbt-sitcp-core/SiTCP_XC7K_32K_BBT_V110.V"] \
  [file normalize "${origin_dir}/hdl/bbt-sitcp-core/TIMER.v"] \
- [file normalize "${origin_dir}/hdl/bbt-sitcp-core/WRAP_SiTCP_GMII_XC7K_32K.V"] \
+ [file normalize "${origin_dir}/hdl/common/sitcp/MOD_WRAP_SiTCP_XC7K.V"] \
  [file normalize "${origin_dir}/hdl/common/sitcp/mii_init.v"] \
  [file normalize "${origin_dir}/hdl/rayraw-impl/rayraw-v1/defYaenamiAdc.vhd"] \
  [file normalize "${origin_dir}/hdl/rayraw-impl/rayraw-v1/defRayrawAdcROV1.vhd"] \
  [file normalize "${origin_dir}/hdl/defBusAddressMap.vhd"] \
  [file normalize "${origin_dir}/hdl/common/bus_controller/defBusController.vhd"] \
+ [file normalize "${origin_dir}/hdl/common/main/RstDelayTimer.vhd"] \
  [file normalize "${origin_dir}/hdl/trgdaq/adc/defAdcBlock.vhd"] \
  [file normalize "${origin_dir}/hdl/trgdaq/trigger/defTriggerManager.vhd"] \
  [file normalize "${origin_dir}/hdl/rayraw-impl/rayraw-v1/defToplevel.vhd"] \
@@ -185,12 +189,49 @@ set files [list \
  [file normalize "${origin_dir}/hdl/common/main/CDCE62002Controller.vhd"] \
  [file normalize "${origin_dir}/hdl/common/main/JKFF.vhd"] \
  [file normalize "${origin_dir}/hdl/common/main/Division10.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/defCDCM.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/ClockMonitor.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/CdcmTxEncoder.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/CdcmTxImpl.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/Cdcm8TxImpl.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/CdcmTx.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/CbtTx.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/CdcmRxDecoder.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/CdcmRxImpl.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/Cdcm8RxImpl.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/CdcmRx.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/CbtRx.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/cbt/CbtLane.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/mikumari-link/defMikumari.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/mikumari-link/PRBS16.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/mikumari-link/MikumariTx.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/mikumari-link/MikumariRx.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/mikumari-link/MikumariLane.vhd"] \
+ [file normalize "${origin_dir}/hdl/mikumari/mikumari-link/Wrapper/MikumariBlock.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/laccp/defLaccp.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/utility/MyDPRamSE.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/laccp/defHeartBeatUnit.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/utility/MyDPRamSRRT.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/utility/MyDPRamARRT.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/utility/MyDPRamDE.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/utility/MyFifoComClock.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/laccp/HeartBeatUnit.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/laccp/defBitwiseOp.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/laccp/LaccpBusSwitch.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/laccp/LaccpFrameRx.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/laccp/LaccpFrameTx.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/laccp/RLIGP.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/laccp/RCAP.vhd"] \
+ [file normalize "${origin_dir}/hdl/laccp/laccp/LaccpMainBlock.vhd"] \
+ [file normalize "${origin_dir}/hdl/utility/mikumari/defMikumariUtil.vhd"] \
+ [file normalize "${origin_dir}/hdl/utility/mikumari/MikumariUtil.vhd"] \
  [file normalize "${origin_dir}/hdl/rayraw-impl/rayraw-v1/ClkDivision.vhd"] \
  [file normalize "${origin_dir}/hdl/trgdaq/mhtdc/defCommonStopBlock.vhd"] \
  [file normalize "${origin_dir}/hdl/trgdaq/mhtdc/FirstFDCEs.vhd"] \
  [file normalize "${origin_dir}/hdl/trgdaq/mhtdc/FineCounter.vhd"] \
  [file normalize "${origin_dir}/hdl/trgdaq/mhtdc/FineCounterDecoder.vhd"] \
  [file normalize "${origin_dir}/hdl/trgdaq/mhtdc/CommonStopBlock.vhd"] \
+ [file normalize "${origin_dir}/hdl/trgdaq/mikuts/MikuTimeStamp.vhd"] \
  [file normalize "${origin_dir}/hdl/trgdaq/daq/defDAQController.vhd"] \
  [file normalize "${origin_dir}/hdl/trgdaq/daq/DAQController.vhd"] \
  [file normalize "${origin_dir}/hdl/common/main/DelayGen.vhd"] \
@@ -438,6 +479,249 @@ if { ![get_property "is_locked" $file_obj] } {
   set_property -name "synth_checkpoint_mode" -value "Singular" -objects $file_obj
 }
 
+set file "$origin_dir/ip/data_buffer/data_buffer.xci"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
+set_property -name "registered_with_manager" -value "1" -objects $file_obj
+if { ![get_property "is_locked" $file_obj] } {
+  set_property -name "synth_checkpoint_mode" -value "Singular" -objects $file_obj
+}
+
+set file "$origin_dir/ip/mikuts_fifo/mikuts_fifo.xci"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
+set_property -name "registered_with_manager" -value "1" -objects $file_obj
+if { ![get_property "is_locked" $file_obj] } {
+  set_property -name "synth_checkpoint_mode" -value "Singular" -objects $file_obj
+}
+
+set file "$origin_dir/ip/mmcm_mikumari/mmcm_mikumari.xci"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
+set_property -name "registered_with_manager" -value "1" -objects $file_obj
+if { ![get_property "is_locked" $file_obj] } {
+  set_property -name "synth_checkpoint_mode" -value "Singular" -objects $file_obj
+}
+
+set file "$origin_dir/hdl/mikumari/cbt/defCDCM.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/ClockMonitor.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/CdcmTxEncoder.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/CdcmTxImpl.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/Cdcm8TxImpl.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/CdcmTx.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/CbtTx.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/CdcmRxDecoder.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/CdcmRxImpl.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/Cdcm8RxImpl.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/CdcmRx.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/CbtRx.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/cbt/CbtLane.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/mikumari-link/defMikumari.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/mikumari-link/PRBS16.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/mikumari-link/MikumariTx.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/mikumari-link/MikumariRx.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/mikumari-link/MikumariLane.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/mikumari/mikumari-link/Wrapper/MikumariBlock.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/utility/mikumari/defMikumariUtil.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL 2008" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/utility/mikumari/MikumariUtil.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL 2008" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/laccp/defLaccp.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/laccp/defHeartBeatUnit.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/utility/MyDPRamSE.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/utility/MyDPRamSRRT.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/utility/MyDPRamARRT.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/utility/MyDPRamDE.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/utility/MyFifoComClock.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/laccp/HeartBeatUnit.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/laccp/defBitwiseOp.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/laccp/LaccpBusSwitch.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/laccp/LaccpFrameRx.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/laccp/LaccpFrameTx.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/laccp/RLIGP.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/laccp/RCAP.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/laccp/laccp/LaccpMainBlock.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
 set file "$origin_dir/hdl/bbt-sitcp-core/SiTCP_XC7K_32K_BBT_V110.V"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
@@ -448,7 +732,7 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "library" -value "mylib" -objects $file_obj
 
-set file "$origin_dir/hdl/bbt-sitcp-core/WRAP_SiTCP_GMII_XC7K_32K.V"
+set file "$origin_dir/hdl/common/sitcp/MOD_WRAP_SiTCP_XC7K.V"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "library" -value "mylib" -objects $file_obj
@@ -477,6 +761,12 @@ set_property -name "file_type" -value "VHDL" -objects $file_obj
 set_property -name "library" -value "mylib" -objects $file_obj
 
 set file "$origin_dir/hdl/common/bus_controller/defBusController.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+set_property -name "library" -value "mylib" -objects $file_obj
+
+set file "$origin_dir/hdl/common/main/RstDelayTimer.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj

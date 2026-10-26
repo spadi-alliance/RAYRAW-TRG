@@ -10,3 +10,9 @@
 [submodule "hdl/utility"]
 	path = hdl/utility
 	url = https://github.com/AMANEQ-official/utility-src.git
+[submodule "hdl/mikumari"]
+	path = hdl/mikumari
+	url = https://github.com/RyotaroHonda/mikumari.git
+[submodule "hdl/LACCP"]
+	path = hdl/LACCP
+	url = https://github.com/RyotaroHonda/LACCP.git

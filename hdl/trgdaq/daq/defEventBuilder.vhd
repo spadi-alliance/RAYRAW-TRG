@@ -31,10 +31,11 @@ package defEVB is
   end record;
 
   -- Builder bus definition --
-  constant kNumBuilderBlock   : integer:= 3;
+  constant kNumBuilderBlock   : integer:= 4;
   -- TDC-L: 1
   -- TDC-T: 1
   -- ADC  : 1
+  -- MIKUTS: 1
 
   subtype BlockID is integer range -1 to kNumBuilderBlock-1;
   type DaqBlock is record
@@ -45,6 +46,7 @@ package defEVB is
   constant kBbTDCL0 : DaqBlock := (ID => 0);
   constant kBbTDCT0 : DaqBlock := (ID => 1);
   constant kBbADC   : DaqBlock := (ID => 2);
+  constant kBbMIKUTS: DaqBlock := (ID => 3);
   constant kBbDummy : DaqBlock := (ID => -1);
 
   constant kWidthBBusAddr   : integer:= 4;

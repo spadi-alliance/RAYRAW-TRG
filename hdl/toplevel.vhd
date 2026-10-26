@@ -1,4 +1,4 @@
-library IEEE;
+ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.std_logic_misc.all;
 use ieee.numeric_std.all;
@@ -22,6 +22,12 @@ use mylib.defRBCP.all;
 use mylib.defMiiRstTimer.all;
 use mylib.defBusAddressMap.all;
 use mylib.defBCT.all;
+
+use mylib.defCDCM.all;
+use mylib.defMikumari.all;
+use mylib.defMikumariUtil.all;
+use mylib.defLaccp.all;
+use mylib.defHeartBeatUnit.all;
 
 entity toplevel is
   Port (
@@ -75,10 +81,10 @@ entity toplevel is
     CDCE_CLKN           : in std_logic_vector(1 downto 0);
 
     -- MIKUMARI -------------------------------------------------------------
-    -- CDCM_RX_P           : in std_logic;
-    -- CDCM_RX_N           : in std_logic;
-    -- CDCM_TX_P           : out std_logic;
-    -- CDCM_TX_N           : out std_logic;
+    MIKUMARI_RXP        : in std_logic;
+    MIKUMARI_RXN        : in std_logic;
+    MIKUMARI_TXP        : out std_logic;
+    MIKUMARI_TXN        : out std_logic;
 
     -- ASIC -----------------------------------------------------------------
     ASIC_REFC           : out std_logic_vector(3 downto 0);
@@ -155,6 +161,9 @@ end toplevel;
 architecture Behavioral of toplevel is
   attribute mark_debug : string;
   attribute keep       : string;
+  constant kEnDebugTop : string := "false";
+
+
 
   -- System ------------------------------------------------------------------
   signal sitcp_reset  : std_logic;
@@ -166,6 +175,9 @@ architecture Behavioral of toplevel is
 
   signal delayed_usr_rstb : std_logic;
 
+  signal pwr_on_reset : std_logic;
+  signal raw_pwr_on_reset : std_logic;
+
   -- DIP ---------------------------------------------------------------------
   signal dip_sw       : std_logic_vector(DIP'range);
   subtype DipID is integer range 1 to 8;
@@ -173,13 +185,115 @@ architecture Behavioral of toplevel is
     Index : DipID;
   end record;
   constant kSiTCP     : regLeaf := (Index => 1);
-  constant kC6CON     : regLeaf := (Index => 2);
-  constant kNC2       : regLeaf := (Index => 3);
+  constant kStandAlone: regLeaf := (Index => 2);
+  constant kC6CON     : regLeaf := (Index => 3);
   constant kNC3       : regLeaf := (Index => 4);
   constant kNC4       : regLeaf := (Index => 5);
   constant kNC5       : regLeaf := (Index => 6);
   constant kNC6       : regLeaf := (Index => 7);
   constant kNC7       : regLeaf := (Index => 8);
+
+  -- MIKUMARI -----------------------------------------------------------------------------
+  constant  kPcbVersion : string:= "v1";
+--  constant  kPcbVersion : string:= "GN-2006-1";
+
+  function GetMikuIoStd(version: string) return string is
+  begin
+    case version is
+      when  "v1" => return "LVDS";
+      when others       => return "LVDS_25";
+    end case;
+  end function;
+
+  constant kNumMikumari       : integer:= 1;
+  constant kIdMikuSec         : integer:= 0;
+
+  signal miku_txp, miku_txn, miku_rxp, miku_rxn   : std_logic_vector(kNumMikumari-1 downto 0);
+
+  subtype MikuScalarPort is std_logic_vector(kNumMikumari-1 downto 0);
+
+  -- CDCM --
+  signal power_on_init        : std_logic;
+
+  signal cbt_lane_up          : MikuScalarPort;
+  signal pattern_error        : MikuScalarPort;
+  signal watchdog_error       : MikuScalarPort;
+
+  signal mod_clk, gmod_clk    : std_logic;
+
+  --type TapValueArray  is array(kNumMikumari-1 downto 0) of std_logic_vector(kWidthTap-1 downto 0);
+  --type SerdesOffsetArray is array(kNumMikumari-1 downto 0) of signed(kWidthSerdesOffset-1 downto 0);
+  signal tap_value_out        : TapArrayType(kNumMikumari-1 downto 0);
+  signal bitslip_num_out      : BitslipArrayType(kNumMikumari-1 downto 0);
+  signal serdes_offset        : SerdesOfsArrayType(kNumMikumari-1 downto 0);
+
+  -- Mikumari --
+  type MikuDataArray is array(kNumMikumari-1 downto 0) of std_logic_vector(7 downto 0);
+  type MikuPulseTypeArray is array(kNumMikumari-1 downto 0) of MikumariPulseType;
+
+  signal miku_tx_ack        : MikuScalarPort;
+  signal miku_data_tx       : MikuDataArray;
+  signal miku_valid_tx      : MikuScalarPort;
+  signal miku_last_tx       : MikuScalarPort;
+  signal busy_pulse_tx      : MikuScalarPort;
+
+  signal mikumari_link_up   : MikuScalarPort;
+  signal miku_data_rx       : MikuDataArray;
+  signal miku_valid_rx      : MikuScalarPort;
+  signal miku_last_rx       : MikuScalarPort;
+  signal checksum_err       : MikuScalarPort;
+  signal frame_broken       : MikuScalarPort;
+  signal recv_terminated    : MikuScalarPort;
+
+  signal pulse_tx, pulse_rx : MikuScalarPort;
+  signal pulse_type_tx, pulse_type_rx  : MikuPulseTypeArray;
+
+ -- LACCP --
+  signal laccp_reset        : MikuScalarPort;
+  signal laccp_pulse_out    : std_logic_vector(kNumLaccpPulse-1 downto 0);
+
+  signal is_ready_for_daq   : MikuScalarPort;
+  signal sync_pulse_out     : std_logic;
+
+  signal is_ready_laccp_intra   : std_logic_vector(kNumExtIntraPort-1 downto 0);
+  signal valid_laccp_intra_in   : std_logic_vector(kNumExtIntraPort-1 downto 0);
+  signal valid_laccp_intra_out  : std_logic_vector(kNumExtIntraPort-1 downto 0);
+  signal data_laccp_intra_in    : ExtIntraType;
+  signal data_laccp_intra_out   : ExtIntraType;
+
+  -- RLIGP --
+  --type LinkAddrArray is array(kNumMikumari-1 downto 0) of std_logic_vector(kPosRegister'range);
+
+  signal link_addr_partter  : IpAddrArrayType(kNumMikumari-1 downto 0);
+  signal valid_link_addr    : MikuScalarPort;
+
+  -- RCAP --
+--  signal idelay_tap_in      : unsigned(tap_value_out'range);
+
+  signal valid_hbc_offset   : std_logic;
+  signal hbc_offset         : std_logic_vector(kWidthHbCount-1 downto 0);
+  signal laccp_fine_offset  : signed(kWidthLaccpFineOffset-1 downto 0);
+  signal local_fine_offset  : signed(kWidthLaccpFineOffset-1 downto 0);
+
+  -- Heartbeat --
+  signal hbu_reset          : std_logic;
+  signal hbu_is_synchronized  : std_logic;
+  signal heartbeat_signal   : std_logic;
+  signal heartbeat_count    : std_logic_vector(kWidthHbCount-1 downto 0);
+  signal hbf_number         : std_logic_vector(kWidthHbfNum-1 downto 0);
+  signal hbf_state          : HbfStateType;
+  signal frame_ctrl_gate    : std_logic;
+  signal hbf_num_mismatch   : std_logic;
+
+  attribute mark_debug of is_ready_for_daq   : signal is kEnDebugTop;
+  attribute mark_debug of sync_pulse_out     : signal is kEnDebugTop;
+  attribute mark_debug of serdes_offset      : signal is kEnDebugTop;
+  attribute mark_debug of laccp_fine_offset  : signal is kEnDebugTop;
+  attribute mark_debug of local_fine_offset  : signal is kEnDebugTop;
+
+  -- Mikumari Util ------------------------------------------------------------
+  signal cbt_init_from_mutil  : MikuScalarPort;
+  signal rst_from_miku        : std_logic;
 
   -- ASIC IO -----------------------------------------------------------------
   signal asic_adc_data            :  std_logic_vector(ADC_DATA_P'range);
@@ -218,9 +332,11 @@ architecture Behavioral of toplevel is
 
   -- ADC ---------------------------------------------------------------------
   signal adc_busy         : std_logic;
-  signal data_adc_bbus    : BBusDataType;
   signal gclk_adc         : std_logic_vector(kNumASIC-1 downto 0);
   signal c_stop           : std_logic;
+
+  -- MIKUMARI TimeStamp ------------------------------------------------------
+  signal miku_ts_busy     : std_logic;
 
   -- IOM ----------------------------------------------------------------------------------
   signal ext_L1           : std_logic;
@@ -230,6 +346,8 @@ architecture Behavioral of toplevel is
 
   -- C6C ----------------------------------------------------------------------------------
   signal c6c_reset        : std_logic;
+  signal cdce_clk_0       : std_logic;
+  signal cdce_clk_1       : std_logic;
 
   -- EVB ----------------------------------------------------------------------------------
   signal evb_reset        : std_logic;
@@ -261,11 +379,18 @@ architecture Behavioral of toplevel is
   signal valid_data, empty_data, req_data  : std_logic;
 
   -- SiTCP ---------------------------------------------------------------------------------
+  signal tmp_sitcp_reset        : std_logic;
+  signal tmp_sitcp_reset_prev   : std_logic;
+  signal os_sitcp_reset         : std_logic;
+
   signal mii_reset    : std_logic;
 
   type typeUdpAddr is array(kNumGtx-1 downto 0) of std_logic_vector(kWidthAddrRBCP-1 downto 0);
   type typeUdpData is array(kNumGtx-1 downto 0) of std_logic_vector(kWidthDataRBCP-1 downto 0);
   type typeTcpData is array(kNumGtx-1 downto 0) of std_logic_vector(kWidthDataTCP-1 downto 0);
+  type typeIpAddr  is array(kNumGtx-1 downto 0) of std_logic_vector(31 downto 0);
+
+  signal sitcp_ip_addr  : typeIpAddr;
 
   signal tcp_isActive, close_req, close_act    : std_logic_vector(kNumGtx-1 downto 0);
 
@@ -334,6 +459,7 @@ architecture Behavioral of toplevel is
         GMII_MDIO_OE          : out    std_logic; --: MDIO output enable
         -- User I/F
         SiTCP_RST             : out    std_logic; --: Reset for SiTCP and related circuits
+        IP_ADDR               : out    std_logic_vector(31 downto 0);
         -- TCP connection control
         TCP_OPEN_REQ          : in std_logic; -- : Reserved input, shoud be 0
         TCP_OPEN_ACK          : out    std_logic; --: Acknowledge for open (=Socket busy)
@@ -359,6 +485,9 @@ architecture Behavioral of toplevel is
   end component;
 
   -- SFP transceiver -----------------------------------------------------------------------
+  constant kPcsPmaLinkStatus  : integer:= 0;
+  signal pcs_pma_status       : std_logic_vector(15 downto 0);
+
   constant kMiiPhyad      : std_logic_vector(kWidthPhyAddr-1 downto 0):= "00000";
   signal mii_init_mdc, mii_init_mdio : std_logic;
 
@@ -442,8 +571,28 @@ architecture Behavioral of toplevel is
      );
   end component;
 
+  signal clk_slow, clk_fast, clk_locked_miku  : std_logic;
+
+  component mmcm_mikumari
+    port
+     (-- Clock in ports
+      clk_in2           : in     std_logic;
+      clk_in_sel        : in     std_logic;
+      -- Clock out ports
+      clk_slow          : out    std_logic;
+      clk_fast          : out    std_logic;
+      -- Status and control signals
+      reset             : in     std_logic;
+      locked            : out    std_logic;
+      clk_in1           : in     std_logic
+     );
+    end component;
+
   -- debug -----------------------------------------------------------------------------
   --attribute mark_debug of clk_150MHz : signal is "true";
+  attribute DONT_TOUCH : string;
+  attribute DONT_TOUCH of cdce_clk_0  : signal is "TRUE";
+  attribute DONT_TOUCH of cdce_clk_1  : signal is "TRUE";
 
 begin
   -- ===================================================================================
@@ -456,10 +605,15 @@ begin
     port map(clk_link, USR_RSTB, delayed_usr_rstb);
 
   c6c_reset       <= '1' when(dip_sw(kC6CON.Index) = '0') else (not delayed_usr_rstb);
-  mmcm_cdcm_reset <= (not delayed_usr_rstb);
+--  mmcm_cdcm_reset <= (not delayed_usr_rstb);
 
-  clk_locked    <= clk_locked_sys and clk_locked_cdcm;
-  system_reset  <= (NOT clk_locked) or (not USR_RSTB);
+  --clk_locked    <= clk_locked_sys and clk_locked_cdcm;
+  system_reset      <= (NOT clk_locked_cdcm) or (not USR_RSTB);
+  raw_pwr_on_reset  <= (not clk_locked_cdcm);
+  u_KeepPwrOnRst : entity mylib.RstDelayTimer
+    port map(raw_pwr_on_reset, X"0FFFFFFF", clk_link, open, pwr_on_reset);
+
+
   user_reset    <= system_reset or rst_from_bus or emergency_reset;
   bct_reset     <= system_reset or emergency_reset;
 
@@ -483,6 +637,282 @@ begin
 
   dummy_signal  <= or_reduce(asic_adc_data) or or_reduce(asic_adc_fco) or or_reduce(asic_adc_dco);
 
+  -- MIKUMARI --------------------------------------------------------------------------
+  u_KeepInit : entity mylib.RstDelayTimer
+    port map(system_reset, X"0FFFFFFF", clk_slow, open, power_on_init );
+
+  gen_mikumari : for i in 0 to kNumMikumari-1 generate
+    laccp_reset(i) <= system_reset or (not mikumari_link_up(i));
+
+    u_Miku_Inst : entity mylib.MikumariBlock
+      generic map(
+        -- CBT generic -------------------------------------------------------------
+        -- CDCM-Mod-Pattern --
+        kCdcmModWidth    => 8,
+        -- CDCM-TX --
+        kIoStandardTx    => GetMikuIoStd(kPcbVersion),
+        kTxPolarity      => TRUE,
+        -- CDCM-RX --
+        genIDELAYCTRL    => TRUE,
+        kDiffTerm        => TRUE,
+        kIoStandardRx    => GetMikuIoStd(kPcbVersion),
+        kRxPolarity      => TRUE,
+        kIoDelayGroup    => "idelay_miku",
+        kFixIdelayTap    => FALSE,
+        kFreqFastClk     => 500.0,
+        kFreqRefClk      => 200.0,
+        -- Encoder/Decoder
+        kNumEncodeBits   => 1,
+        -- Master/Slave
+        kCbtMode         => "Slave",
+        -- DEBUG --
+        enDebugCBT       => FALSE,
+
+        -- MIKUMARI generic --------------------------------------------------------
+        enScrambler      => TRUE,
+        kHighPrecision   => FALSE,
+        -- DEBUG --
+        enDebugMikumari  => FALSE
+      )
+      port map(
+        -- System ports -----------------------------------------------------------
+        rst           => system_reset,
+        pwrOnRst      => pwr_on_reset,
+        clkSer        => clk_fast,
+        clkPar        => clk_slow,
+        clkIndep      => clk_indep,
+        clkIdctrl     => clk_indep,
+        initIn        => power_on_init or cbt_init_from_mutil(i),
+
+        TXP           => MIKUMARI_TXP,
+        TXN           => MIKUMARI_TXN,
+        RXP           => MIKUMARI_RXP,
+        RXN           => MIKUMARI_RXN,
+        modClk        => mod_clk,
+        tapValueIn    => (others => '0'),
+        txBeat        => open,
+
+        -- CBT ports ------------------------------------------------------------
+        laneUp        => cbt_lane_up(i),
+        idelayErr     => open,
+        bitslipErr    => open,
+        pattErr       => pattern_error(i),
+        watchDogErr   => watchdog_error(i),
+
+        tapValueOut   => tap_value_out(i),
+        bitslipNum    => bitslip_num_out(i),
+        serdesOffset  => serdes_offset(i),
+        firstBitPatt  => open,
+
+        -- Mikumari ports -------------------------------------------------------
+        linkUp        => mikumari_link_up(i),
+
+        -- TX port --
+        -- Data I/F --
+        dataInTx      => miku_data_tx(i),
+        validInTx     => miku_valid_tx(i),
+        frameLastInTx => miku_last_tx(i),
+        txAck         => miku_tx_ack(i),
+
+        pulseIn       => pulse_tx(i),
+        pulseTypeTx   => pulse_type_tx(i),
+        pulseRegTx    => "0000",
+        busyPulseTx   => busy_pulse_tx(i),
+
+        -- RX port --
+        -- Data I/F --
+        dataOutRx   => miku_data_rx(i),
+        validOutRx  => miku_valid_rx(i),
+        frameLastRx => miku_last_rx(i),
+        checksumErr => checksum_err(i),
+        frameBroken => frame_broken(i),
+        recvTermnd  => recv_terminated(i),
+
+        pulseOut    => pulse_rx(i),
+        pulseTypeRx => pulse_type_rx(i),
+        pulseRegRx  => open
+
+      );
+
+    --
+    --idelay_tap_in   <= unsigned(tap_value_out);
+
+    u_LACCP : entity mylib.LaccpMainBlock
+      generic map
+        (
+          kPrimaryMode      => false,
+          kNumInterconnect  => 1,
+          enDebug           => false
+        )
+      port map
+        (
+          -- System --------------------------------------------------------
+          rst               => laccp_reset(i),
+          clk               => clk_slow,
+
+          -- User Interface ------------------------------------------------
+          isReadyForDaq     => is_ready_for_daq(i),
+          laccpPulsesIn     => (others => '0'),
+          laccpPulsesOut    => laccp_pulse_out,
+          pulseInRejected   => open,
+
+          -- RLIGP --
+          addrMyLink        => sitcp_ip_addr(0),
+          validMyLink       => not emergency_reset,
+          addrPartnerLink   => link_addr_partter(i),
+          validPartnerLink  => valid_link_addr(i),
+
+          -- RCAP --
+          idelayTapIn       => unsigned(tap_value_out(i)),
+          serdesLantencyIn  => serdes_offset(i),
+          idelayTapOut      => open,
+          serdesLantencyOut => open,
+
+          hbuIsSyncedIn     => hbu_is_synchronized,
+          syncPulseIn       => '0',
+          syncPulseOut      => sync_pulse_out,
+
+          upstreamOffset    => (others => '0'),
+          validOffset       => valid_hbc_offset,
+          hbcOffset         => hbc_offset,
+          fineOffset        => laccp_fine_offset,
+          fineOffsetLocal   => local_fine_offset,
+
+          -- LACCP Bus Port ------------------------------------------------
+          -- Intra-port--
+          isReadyIntraIn    => is_ready_laccp_intra,
+          dataIntraIn       => data_laccp_intra_in,
+          validIntraIn      => valid_laccp_intra_in,
+          dataIntraOut      => data_laccp_intra_out,
+          validIntraOut     => valid_laccp_intra_out,
+
+          -- Interconnect --
+          isReadyInterIn    => (others => '0'),
+          existInterOut     => open,
+          dataInterIn       => (others => (others => '0')),
+          validInterIn      => (others => '0'),
+          dataInterOut      => open,
+          validInterOut     => open,
+
+          -- MIKUMARI-Link -------------------------------------------------
+          mikuLinkUpIn      => mikumari_link_up(i),
+
+          -- TX port --
+          dataTx            => miku_data_tx(i),
+          validTx           => miku_valid_tx(i),
+          frameLastTx       => miku_last_tx(i),
+          txAck             => miku_tx_ack(i),
+
+          pulseTx           => pulse_tx(i),
+          pulseTypeTx       => pulse_type_tx(i),
+          busyPulseTx       => busy_pulse_tx(i),
+
+          -- RX port --
+          dataRx            => miku_data_rx(i),
+          validRx           => miku_valid_rx(i),
+          frameLastRx       => miku_last_rx(i),
+          checkSumErrRx     => checksum_err(i),
+          frameBrokenRx     => frame_broken(i),
+          recvTermndRx      => recv_terminated(i),
+
+          pulseRx           => pulse_rx(i),
+          pulseTypeRx       => pulse_type_rx(i)
+
+        );
+  end generate;
+
+  --
+  --u_sync_nim1 : entity mylib.synchronizer port map(clk_slow, NIM_IN(1), frame_ctrl_gate);
+  frame_ctrl_gate <= '0';
+  hbu_reset       <= system_reset when(dip_sw(kStandAlone.Index) = '1') else laccp_reset(0);
+
+  u_HBU : entity mylib.HeartBeatUnit
+    generic map
+      (
+        enDebug           => false
+      )
+    port map
+      (
+        -- System --
+        rst               => hbu_reset,
+        clk               => clk_slow,
+        enStandAlone      => DIP(kStandAlone.Index),
+        keepLocalHbfNum   => '1',
+
+        -- Sync I/F --
+        syncPulseIn       => sync_pulse_out,
+        hbcOffsetIn       => hbc_offset,
+        validOffsetIn     => valid_hbc_offset,
+        isSynchronized    => hbu_is_synchronized,
+
+        -- HeartBeat I/F --
+        heartbeatOut      => heartbeat_signal,
+        heartbeatCount    => heartbeat_count,
+        hbfNumber         => hbf_number,
+        hbfNumMismatch    => hbf_num_mismatch,
+        clkDiv16          => open,
+
+        -- DAQ I/F --
+        hbfCtrlGateIn     => frame_ctrl_gate,
+        forceOn           => '1',
+        frameState        => hbf_state,
+
+        hbfFlagsIn        => "00",
+        frameFlags        => open,
+
+        -- LACCP Bus --
+        dataBusIn         => data_laccp_intra_out(GetExtIntraIndex(kPortHBU)),
+        validBusIn        => valid_laccp_intra_out(GetExtIntraIndex(kPortHBU)),
+        dataBusOut        => data_laccp_intra_in(GetExtIntraIndex(kPortHBU)),
+        validBusOut       => valid_laccp_intra_in(GetExtIntraIndex(kPortHBU)),
+        isReadyOut        => is_ready_laccp_intra(GetExtIntraIndex(kPortHBU))
+
+      );
+
+  -- MIKUMARI utility ---------------------------------------------------------------------
+  u_MUTIL : entity mylib.MikumariUtil
+    generic map(
+      kNumMikumari => kNumMikumari,
+      kSecondaryId => kIdMikuSec,
+      kWidthHbCount => kWidthHbCount,
+      kWidthLaccpFineOffset => kWidthLaccpFineOffset
+    )
+    port map(
+      -- System ----------------------------------------------------
+      rst               => user_reset,
+      clk               => clk_slow,
+
+      clockRootMode     => DIP(kStandAlone.Index),
+
+      -- CBT status ports --
+      cbtLaneUp           => cbt_lane_up,
+      tapValueIn          => tap_value_out,
+      bitslipNumIn        => bitslip_num_out,
+      cbtInitOut          => cbt_init_from_mutil,
+      tapValueOut         => open,
+      rstOverMikuOut      => open,
+
+      -- MIKUMARI Link ports --
+      mikuLinkUp          => mikumari_link_up,
+
+      -- LACCP ports --
+      laccpUp             => is_ready_for_daq,
+      partnerIpAddr       => link_addr_partter,
+      hbcOffset           => hbc_offset,
+      localFineOffset     => std_logic_vector(local_fine_offset),
+      laccpFineOffset     => std_logic_vector(laccp_fine_offset),
+      hbfState            => open,
+
+      -- Local bus --
+      addrLocalBus        => addr_LocalBus,
+      dataLocalBusIn      => data_LocalBusIn,
+      dataLocalBusOut     => data_LocalBusOut(kMUTIL.ID),
+      reLocalBus          => re_LocalBus(kMUTIL.ID),
+      weLocalBus          => we_LocalBus(kMUTIL.ID),
+      readyLocalBus       => ready_LocalBus(kMUTIL.ID)
+    );
+
+
 
 
   -- Fixed IO ports --------------------------------------------------------------------
@@ -491,9 +921,9 @@ begin
 
   -- TRM -------------------------------------------------------------------------------
   -- LED <= clk_locked_sys & clk_locked_cdcm & module_busy &  tcp_isActive;
-  LED <= CDCE_LOCK & clk_locked_cdcm & module_busy &  tcp_isActive;
+  LED <= sitcp_reset & clk_locked_miku & module_busy &  tcp_isActive;
 
-  seq_busy   <= tdc_busy OR adc_busy; -- OR dip_sw(kFBUSY.Index);
+  seq_busy   <= tdc_busy OR adc_busy or miku_ts_busy; -- OR dip_sw(kFBUSY.Index);
 
   u_TRM_Inst :  entity mylib.TriggerManager
     port map(
@@ -624,7 +1054,6 @@ begin
       );
 
   -- ADC -------------------------------------------------------------------------------
-  data_bbus(kBbADC.ID) <= data_adc_bbus;
 
   u_ADC_Inst : entity mylib.AdcBlock
     port map(
@@ -647,7 +1076,7 @@ begin
 
       -- Builder bus -- TODO: change later
       addrBuilderBus      => addr_bbus,
-      dataBuilderBusOut   => data_adc_bbus,
+      dataBuilderBusOut   => data_bbus(kBbADC.ID),
       reBuilderBus        => re_bbus(kBbADC.ID),
       rvBuilderBus        => rv_bbus(kBbADC.ID),
       dReadyBuilderBus    => dready_bbus(kBbADC.ID),
@@ -671,6 +1100,33 @@ begin
 
       -- Event Id --
       eventIdIn           => tdc_event_id
+      );
+
+  -- MIKUMARI TimeStamp ----------------------------------------------------------------
+  u_MIKUTS_Inst : entity mylib.MikuTimeStamp
+    port map (
+      rst                 => user_reset,
+      clk                 => clk_sys,
+      clkSlow             => clk_slow,
+
+      -- LACCP TimeStamp --
+      timeStamp           => hbf_number(7 downto 0) & heartbeat_count,
+
+      -- data in --
+      triggerIn           => trigger_out,
+
+      -- data out --
+      moduleBusy          => miku_ts_busy,
+
+      -- Builder bus --
+      addrBuilderBus      => addr_bbus,
+      dataBuilderBusOut   => data_bbus(kBbMIKUTS.ID),
+      reBuilderBus        => re_bbus(kBbMIKUTS.ID),
+      rvBuilderBus        => rv_bbus(kBbMIKUTS.ID),
+      dReadyBuilderBus    => dready_bbus(kBbMIKUTS.ID),
+      bindBuilderBus      => bind_bbus(kBbMIKUTS.ID),
+      isBoundToBuilder    => isbound_to_builder(kBbMIKUTS.ID)
+
       );
 
   -- IOM -------------------------------------------------------------------------------
@@ -912,7 +1368,21 @@ begin
 
 
   -- SiTCP Inst ------------------------------------------------------------------------
-  sitcp_reset     <= system_reset OR (NOT USR_RSTB);
+--  sitcp_reset     <= system_reset OR (NOT USR_RSTB);
+  u_SiTCPRst : entity mylib.ResetGen
+    port map((not pcs_pma_status(kPcsPmaLinkStatus)) or (not delayed_usr_rstb ), clk_link, tmp_sitcp_reset);
+
+  process(clk_link)
+  begin
+    if(clk_link'event and clk_link='1') then
+      -- Edge detection of tmp_sitcp_reset and make one clock wide pulse
+      os_sitcp_reset <= tmp_sitcp_reset OR (tmp_sitcp_reset_prev AND (not tmp_sitcp_reset));
+      tmp_sitcp_reset_prev <= tmp_sitcp_reset;
+    end if;
+  end process;
+
+  u_KeepSiTCPRst : entity mylib.RstDelayTimer
+    port map(os_sitcp_reset, X"00000FFF", clk_link, open, sitcp_reset);
 
   gen_SiTCP : for i in 0 to kNumGtx-1 generate
 
@@ -962,6 +1432,7 @@ begin
         GMII_MDIO_OE      => open, --: MDIO output enable
         -- User I/F
         SiTCP_RST         => emergency_reset, --: Reset for SiTCP and related circuits
+        IP_ADDR          => sitcp_ip_addr(i), --: IP address[31:0]
         -- TCP connection control
         TCP_OPEN_REQ      => '0', -- : Reserved input, shoud be 0
         TCP_OPEN_ACK      => tcp_isActive(i), --: Acknowledge for open (=Socket busy)
@@ -1022,7 +1493,7 @@ begin
   -- SFP transceiver -------------------------------------------------------------------
   u_MiiRstTimer_Inst : entity mylib.MiiRstTimer
     port map(
-      rst         => system_reset,
+      rst         => (not pcs_pma_status(kPcsPmaLinkStatus)),
       clk         => clk_link,
       rstMiiOut   => mii_reset
     );
@@ -1130,8 +1601,8 @@ begin
 
         -- General IO's
         ---------------
-        status_vector        => open,
-        reset                => system_reset
+        status_vector        => pcs_pma_status,
+        reset                => pwr_on_reset
         );
   end generate;
 
@@ -1162,10 +1633,30 @@ begin
      clk_tdc2          => clk_tdc(2),
      clk_tdc3          => clk_tdc(3),
      -- Status and control signals
-     reset             => mmcm_cdcm_reset,
+     reset             => (not clk_locked_sys),
      locked            => clk_locked_cdcm,
      clk_in1           => clk_link
     );
+
+  u_BUFG :  BUFG
+    port map (
+      O => gmod_clk, -- 1-bit output: Clock output
+      I => mod_clk  -- 1-bit input: Clock input
+    );
+
+  u_ClkMiku_Inst : mmcm_mikumari
+    port map
+     (-- Clock in ports
+      clk_in2           => gmod_clk,
+      clk_in_sel        => dip_sw(kStandAlone.Index),
+      -- Clock out ports
+      clk_slow          => clk_slow,
+      clk_fast          => clk_fast,
+      -- Status and control signals
+      reset             => (not clk_locked_sys),
+      locked            => clk_locked_miku,
+      clk_in1           => clk_link
+     );
 
   u_ClkDivision : entity mylib.ClkDivision
     port map(
@@ -1182,26 +1673,26 @@ begin
   -- CDCE clocks --
   -- pll_is_locked   <= (mmcm_cdcm_locked or CDCE_LOCK) and clk_sys_locked;
 
---  u_IBUFDS_SLOW_inst : IBUFDS
---    generic map (
---       DIFF_TERM => TRUE, -- Differential Termination
---       IBUF_LOW_PWR => FALSE, -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
---       IOSTANDARD => "LVDS")
---    port map (
---       O => NIM_OUT(1),  -- Buffer output
---       I => CDCE_CLKP(0),  -- Diff_p buffer input (connect directly to top-level port)
---       IB => CDCE_CLKN(0) -- Diff_n buffer input (connect directly to top-level port)
---       );
---
---  u_IBUFDS_FAST_inst : IBUFDS
---    generic map (
---       DIFF_TERM => TRUE, -- Differential Termination
---       IBUF_LOW_PWR => FALSE, -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
---       IOSTANDARD => "LVDS")
---    port map (
---       O => NIM_OUT(2),  -- Buffer output
---       I => CDCE_CLKP(1),  -- Diff_p buffer input (connect directly to top-level port)
---       IB => CDCE_CLKN(1) -- Diff_n buffer input (connect directly to top-level port)
---       );
+  u_IBUFDS_SLOW_inst : IBUFDS
+    generic map (
+       DIFF_TERM => TRUE, -- Differential Termination
+       IBUF_LOW_PWR => FALSE, -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
+       IOSTANDARD => "LVDS")
+    port map (
+       O => cdce_clk_0,  -- Buffer output
+       I => CDCE_CLKP(0),  -- Diff_p buffer input (connect directly to top-level port)
+       IB => CDCE_CLKN(0) -- Diff_n buffer input (connect directly to top-level port)
+       );
+
+  u_IBUFDS_FAST_inst : IBUFDS
+    generic map (
+       DIFF_TERM => TRUE, -- Differential Termination
+       IBUF_LOW_PWR => FALSE, -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
+       IOSTANDARD => "LVDS")
+    port map (
+       O => cdce_clk_1,  -- Buffer output
+       I => CDCE_CLKP(1),  -- Diff_p buffer input (connect directly to top-level port)
+       IB => CDCE_CLKN(1) -- Diff_n buffer input (connect directly to top-level port)
+       );
 
 end Behavioral;

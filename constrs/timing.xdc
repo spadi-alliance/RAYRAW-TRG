@@ -4,6 +4,10 @@ create_clock -period 13.333 -name adc_dclk1 -waveform {0.000 6.666} [get_ports {
 create_clock -period 13.333 -name adc_dclk2 -waveform {0.000 6.666} [get_ports {ADC_DCLK_P[2]}]
 create_clock -period 13.333 -name adc_dclk3 -waveform {0.000 6.666} [get_ports {ADC_DCLK_P[3]}]
 
+create_clock -period 8.000 -name clk_gmod -waveform {0.000 4.000} [get_pins u_BUFG/O]
+
+set_case_analysis 0 [get_pins u_ClkMiku_Inst/inst/mmcm_adv_inst/CLKINSEL]
+
 # SiTCP
 set_false_path -through [get_nets {gen_SiTCP[*].u_SiTCP_Inst/SiTCP/SiTCP_INT/SiTCP_INT_REG/regX11Data*}]
 set_false_path -through [get_nets {gen_SiTCP[*].u_SiTCP_Inst/SiTCP/SiTCP_INT/SiTCP_INT_REG/regX12Data*}]
@@ -75,12 +79,15 @@ create_generated_clock -name rclk_adc1 [get_pins {u_ADC_Inst/u_ADC/gen_adc[1].u_
 create_generated_clock -name rclk_adc2 [get_pins {u_ADC_Inst/u_ADC/gen_adc[2].u_adc/u_BUFR_inst/O}]
 create_generated_clock -name rclk_adc3 [get_pins {u_ADC_Inst/u_ADC/gen_adc[3].u_adc/u_BUFR_inst/O}]
 
+create_generated_clock -name clk_slow [get_pins u_ClkMiku_Inst/inst/mmcm_adv_inst/CLKOUT0]
+create_generated_clock -name clk_fast [get_pins u_ClkMiku_Inst/inst/mmcm_adv_inst/CLKOUT1]
+
 set_multicycle_path -setup -from [get_clocks clk_tdc_270] -to [get_clocks clk_tdc_0] 2
 
 create_generated_clock -name clk_gmii1 [get_pins u_GtClockDist_Inst/core_clocking_i/mmcm_adv_inst/CLKOUT0]
 create_generated_clock -name clk_gmii2 [get_pins u_GtClockDist_Inst/core_clocking_i/mmcm_adv_inst/CLKOUT1]
 
-set_clock_groups -name async_sys -asynchronous -group {clk_tdc_0 clk_tdc_90 clk_tdc_180 clk_tdc_270 clk_sys} -group clk_link -group clk_indep -group clk_spi -group clk_10mhz -group {clk_gmii1 clk_gmii2} -group rclk_adc0 -group rclk_adc1 -group rclk_adc2 -group rclk_adc3
+set_clock_groups -name async_sys -asynchronous -group {clk_tdc_0 clk_tdc_90 clk_tdc_180 clk_tdc_270 clk_sys} -group clk_link -group clk_indep -group clk_spi -group clk_10mhz -group {clk_gmii1 clk_gmii2} -group rclk_adc0 -group rclk_adc1 -group rclk_adc2 -group rclk_adc3 -group {clk_slow clk_fast}
 
 
 
