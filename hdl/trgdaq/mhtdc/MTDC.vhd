@@ -267,6 +267,7 @@ begin
       reg_tdc.tdc.offset_ptr  <= (others => '0');
       reg_tdc.tdc.window_max  <= (others => '0');
       reg_tdc.tdc.window_min  <= (others => '0');
+      reg_tdc.tdc.hit_mask    <= (others => '0');
       reg_tdc.hit_threshold   <= (others => '0');
       reg_tdc.latch_window    <= (others => '0');
       reg_tdc.geometry_count  <= (others => '0');
@@ -316,6 +317,18 @@ begin
                 reg_tdc.tdc.window_min(7 downto 0)  <= dataLocalBusIn;
               elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
                 reg_tdc.tdc.window_min(kWidthCoarseCount-1 downto 8)  <= dataLocalBusIn(kWidthCoarseCount-1-8 downto 0);
+              else
+              end if;
+
+            when kHitMask(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                reg_tdc.tdc.hit_mask(7 downto 0) <= dataLocalBusIn;
+              elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
+                reg_tdc.tdc.hit_mask(15 downto 8) <= dataLocalBusIn;
+              elsif(addrLocalBus(kMultiByte'range) = k3rdbyte) then
+                reg_tdc.tdc.hit_mask(23 downto 16) <= dataLocalBusIn;
+              elsif(addrLocalBus(kMultiByte'range) = k4thbyte) then
+                reg_tdc.tdc.hit_mask(31 downto 24) <= dataLocalBusIn;
               else
               end if;
 
@@ -379,6 +392,18 @@ begin
                 dataLocalBusOut <= reg_tdc.tdc.window_min(7 downto 0);
               elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
                 dataLocalBusOut <= "00000" & reg_tdc.tdc.window_min(kWidthCoarseCount-1 downto 8);
+              else
+              end if;
+
+            when kHitMask(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                dataLocalBusOut <= reg_tdc.tdc.hit_mask(7 downto 0);
+              elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
+                dataLocalBusOut <= reg_tdc.tdc.hit_mask(15 downto 8);
+              elsif(addrLocalBus(kMultiByte'range) = k3rdbyte) then
+                dataLocalBusOut <= reg_tdc.tdc.hit_mask(23 downto 16);
+              elsif(addrLocalBus(kMultiByte'range) = k4thbyte) then
+                dataLocalBusOut <= reg_tdc.tdc.hit_mask(31 downto 24);
               else
               end if;
 

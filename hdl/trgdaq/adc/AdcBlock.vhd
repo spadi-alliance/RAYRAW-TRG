@@ -861,7 +861,7 @@ begin
         else
           free_words := to_unsigned(kMaxAdcChDepth, free_words'length) - resize(unsigned(dcount_chfifo(i)), free_words'length);
         end if;
-        if((reg_adc.enable_zerosup = '0') OR (event_hit_mask(i) = '1')) then
+        if((reg_adc.hit_mask(i) = '0') AND ((reg_adc.enable_zerosup = '0') OR (event_hit_mask(i) = '1'))) then
           reserved_words := resize(unsigned(reg_adc.window_max) - unsigned(reg_adc.window_min), kWidthAdcChDataCount) + to_unsigned(1 + kMaxAdcChThreshold, kWidthAdcChDataCount);
         else
           reserved_words := to_unsigned(1 + kMaxAdcChThreshold, kWidthAdcChDataCount);
@@ -947,7 +947,7 @@ begin
     end if;
   end process;
 
-  channel_write_mask <= (others => '1') when(reg_adc.enable_zerosup = '0') else reg_event_hit_mask;
+  channel_write_mask <= (NOT reg_adc.hit_mask) when(reg_adc.enable_zerosup = '0') else (reg_event_hit_mask AND (NOT reg_adc.hit_mask));
   u_SearchProcess : process(rst, clkSys)
   begin
     if(rst = '1') then
@@ -1211,6 +1211,7 @@ begin
       reg_adc.window_min     <= (others => '0');
       reg_adc.enable_zerosup <= '0';
       reg_adc.hit_timeout    <= std_logic_vector(to_unsigned(kHitTimeoutSamples, kWidthTimeoutSamples));
+      reg_adc.hit_mask       <= (others => '0');
       reg_adc_ro_reset       <= '1';
       state_lbus             <= Init;
     elsif(clkSys'event and clkSys = '1') then
@@ -1269,6 +1270,18 @@ begin
               else
               end if;
 
+            when kHitMask(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                reg_adc.hit_mask(7 downto 0) <= dataLocalBusIn;
+              elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
+                reg_adc.hit_mask(15 downto 8) <= dataLocalBusIn;
+              elsif(addrLocalBus(kMultiByte'range) = k3rdbyte) then
+                reg_adc.hit_mask(23 downto 16) <= dataLocalBusIn;
+              elsif(addrLocalBus(kMultiByte'range) = k4thbyte) then
+                reg_adc.hit_mask(31 downto 24) <= dataLocalBusIn;
+              else
+              end if;
+
             when kAdcRoReset(kNonMultiByte'range) =>
               reg_adc_ro_reset  <= dataLocalBusIn(0);
 
@@ -1311,6 +1324,18 @@ begin
             when kHitTimeout(kNonMultiByte'range) =>
               if(addrLocalBus(kMultiByte'range) = k1stbyte) then
                 dataLocalBusOut <= reg_adc.hit_timeout;
+              else
+              end if;
+
+            when kHitMask(kNonMultiByte'range) =>
+              if(addrLocalBus(kMultiByte'range) = k1stbyte) then
+                dataLocalBusOut <= reg_adc.hit_mask(7 downto 0);
+              elsif(addrLocalBus(kMultiByte'range) = k2ndbyte) then
+                dataLocalBusOut <= reg_adc.hit_mask(15 downto 8);
+              elsif(addrLocalBus(kMultiByte'range) = k3rdbyte) then
+                dataLocalBusOut <= reg_adc.hit_mask(23 downto 16);
+              elsif(addrLocalBus(kMultiByte'range) = k4thbyte) then
+                dataLocalBusOut <= reg_adc.hit_mask(31 downto 24);
               else
               end if;
 

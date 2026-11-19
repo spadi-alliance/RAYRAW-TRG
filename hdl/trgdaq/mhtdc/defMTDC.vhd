@@ -41,6 +41,7 @@ package defMTDC is
   constant kSelfHitThreshold : LocalAddressType := x"040"; -- W/R, [5:0], Hit Threshold
   constant kSelfHitLatchWin  : LocalAddressType := x"050"; -- W/R, [3:0], Hit latch window
   constant kSelfGeoCount     : LocalAddressType := x"060"; -- W/R, [4:0],
+  constant kHitMask          : LocalAddressType := x"070"; -- W/R, [31:0]. Hit Mask
   constant kSelfGeoMaskBase  : LocalAddressType := x"100"; -- W/R,
 
   type regMTDC is record

@@ -77,6 +77,7 @@ package defTdcBlock is
     offset_ptr      : std_logic_vector(kWidthCoarseCount-1 downto 0); -- 2047 - window_max +2
     window_max      : std_logic_vector(kWidthCoarseCount-1 downto 0);
     window_min      : std_logic_vector(kWidthCoarseCount-1 downto 0);
+    hit_mask        : std_logic_vector(kNumInputBlock-1 downto 0);
   end record;
 
 end package defTdcBlock;

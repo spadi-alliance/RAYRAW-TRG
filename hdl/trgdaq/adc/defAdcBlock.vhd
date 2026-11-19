@@ -84,6 +84,7 @@ package defAdcBlock is
     window_min     : std_logic_vector(kWidthCoarseCount-1 downto 0);
     enable_zerosup : std_logic;
     hit_timeout    : std_logic_vector(kWidthTimeoutSamples-1 downto 0);
+    hit_mask       : std_logic_vector(kNumAdcInputBlock-1 downto 0);
   end record;
 
   -- Local Address --------------------------------------------------------
@@ -94,6 +95,7 @@ package defAdcBlock is
   constant kIsReady         : LocalAddressType := x"040"; -- R,   [3:0], AdcRo IsReady signals
   constant kEnZeroSup       : LocalAddressType := x"050"; -- W/R, [0:0], Zero Suppression Enable
   constant kHitTimeout      : LocalAddressType := x"060"; -- W/R, [7:0], Hit Time out
+  constant kHitMask         : LocalAddressType := x"070"; -- W/R, [31:0]. Hit Mask
 
   -- Region of interest ---------------------------------------------------
   constant kRoiPre          : positive:= 20; -- -> change into register [4:0]
